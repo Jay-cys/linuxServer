@@ -2,11 +2,10 @@
 
 ## 系统配置
 
-1. 在虚拟机中安装Linux系统，本项目采用`VMware Workstation 16.1.2`和`Ubuntu 18.04`，本机系统为`Win 10`
+1. 在虚拟机中安装Linux系统，本项目采用 `VMware Workstation 16.1.2`和 `Ubuntu 18.04`，本机系统为 `Win 10`
+2. 更新 `Ubuntu 18.04`源并安装 `open-vm-tools`
 
-2. 更新`Ubuntu 18.04`源并安装`open-vm-tools`
-
-   1. 进入`/etc/apt/sources.list` 修改为国内镜像源（速度快），全部删除，替换为下述内容，如果更新报错，将`https`换成`http`
+   1. 进入 `/etc/apt/sources.list` 修改为国内镜像源（速度快），全部删除，替换为下述内容，如果更新报错，将 `https`换成 `http`
 
       ```shell
       # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
@@ -18,12 +17,11 @@
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
       deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
-      
+
       # 预发布软件源，不建议启用
       # deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
       ```
-
    2. 更新系统源：
 
       ```shell
@@ -32,43 +30,35 @@
       # upgrade 是升级已安装的所有软件包(可选)
       # sudo apt upgrade
       ```
-
-   3. 安装`open-vm-tools`：`sudo apt install open-vm-tools`
-
-   4. ~~如果要实现文件夹共享，需要安装`open-vm-tools-dkms`：`sudo apt install open-vm-tools-dkms`~~=>清华源找不到`open-vm-tools-dkms`，不安装不影响
-
-   5. 桌面环境还需要安装`open-vm-tools-desktop`以支持双向拖放文件：`sudo apt install open-vm-tools-desktop`
-
-   6. 重启（使用`VMware`自带重启，使用`reboot`重启可能失败）后成功进行拖拽复制
+   3. 安装 `open-vm-tools`：`sudo apt install open-vm-tools`
+   4. ~~如果要实现文件夹共享，需要安装 `open-vm-tools-dkms`：`sudo apt install open-vm-tools-dkms`~~=>清华源找不到 `open-vm-tools-dkms`，不安装不影响
+   5. 桌面环境还需要安装 `open-vm-tools-desktop`以支持双向拖放文件：`sudo apt install open-vm-tools-desktop`
+   6. 重启（使用 `VMware`自带重启，使用 `reboot`重启可能失败）后成功进行拖拽复制
 
    注：[参考链接](https://blog.csdn.net/hhdhz/article/details/87922794)
-
-3. 在`Ubuntu 18.10`安装必要组件
+3. 在 `Ubuntu 18.10`安装必要组件
 
    ```shell
    # 安装Vim环境
    sudo apt install vim
-   
+
    # 用于远程连接虚拟机
    sudo apt install openssh-server
-   
+
    # 用于查看IP地址
    sudo apt install net-tools
-   
+
    # 树形查看文件夹内容
    sudo apt install tree
    ```
 
 ## VS code
 
-1. 安装`Remote Development`插件
-
-2. 在Linux中使用`ifconfig`查看`ip地址`
-
-3. 按下图步骤设置`config`文件
+1. 安装 `Remote Development`插件
+2. 在Linux中使用 `ifconfig`查看 `ip地址`
+3. 按下图步骤设置 `config`文件
 
    ![image-20210831142010206](01Linux系统编程入门/image-20210831142010206.png)
-
 4. `config`内容如下
 
    ```shell
@@ -82,9 +72,9 @@
 
 ### 说明
 
-本部分笔记及源码出自`slide/01Linux系统编程入门/01 GCC`
+本部分笔记及源码出自 `slide/01Linux系统编程入门/01 GCC`
 
-### 安装`gcc`
+### 安装 `gcc`
 
 命令：`sudo apt install gcc g++`，本项目安装版本为：`7.5.0`
 
@@ -104,7 +94,7 @@
 
     ```c
     #include<stdio.h>
-    
+
     int main()
     {
     #if DEBUG
@@ -114,23 +104,21 @@
         return 0;
     }
     ```
-
   - 编译命令1：
 
     ```shell
     gcc test.c -o test
     ./test
-    
+
     # 输出
     hello, world
     ```
-
   - 编译命令2：
 
     ```shell
     gcc test.c -o test -D DEBUG
     ./test
-    
+
     # 输出
     Debug
     hello, world
@@ -138,14 +126,14 @@
 
 ### gcc与g++区别
 
-- `gcc` 和 `g++` 都是`GNU(组织)`的一个编译器
+- `gcc` 和 `g++` 都是 `GNU(组织)`的一个编译器
 - **误区一**：`gcc` 只能编译 c 代码，g++ 只能编译 c++ 代码
-  - 后缀为` .c` 的，`gcc` 把它当作是 C 程序，而 `g++` 当作是 `c++` 程序
+  - 后缀为 ` .c` 的，`gcc` 把它当作是 C 程序，而 `g++` 当作是 `c++` 程序
   - 后缀为 `.cpp` 的，两者都会认为是 `C++` 程序，`C++` 的语法规则更加严谨一些
   - 编译阶段，`g++` 会调用 `gcc`，对于 `C++` 代码，两者是等价的，但是因为 `gcc` 命令不能自动和 `C++` 程序使用的库联接，所以通常用 `g++` 来完成链接，为了统一起见，干脆编译/链接统统用 `g++` 了，这就给人一种错觉，好像 `cpp` 程序只能用 `g++` 似的
-- **误区二**：`gcc` 不会定义 `__cplusplus` 宏，而 `g++` 会 
+- **误区二**：`gcc` 不会定义 `__cplusplus` 宏，而 `g++` 会
   - 实际上，这个宏只是标志着编译器将会把代码按 C 还是 C++ 语法来解释
-  - 如上所述，如果后缀为` .c`，并且采用 `gcc` 编译器，则该宏就是未定义的，否则，就是已定义
+  - 如上所述，如果后缀为 ` .c`，并且采用 `gcc` 编译器，则该宏就是未定义的，否则，就是已定义
 - **误区三**：编译只能用 `gcc`，链接只能用 `g++`
   - 严格来说，这句话不算错误，但是它混淆了概念，应该这样说：编译可以用 `gcc/g++`，而链接可以用 `g++` 或者 `gcc -lstdc++`
   - `gcc` 命令不能自动和C++程序使用的库联接，所以通常使用 `g++` 来完成链接。但在编译阶段，`g++` 会自动调用 `gcc`，二者等价
@@ -156,13 +144,13 @@
 
 ### 说明
 
-本部分笔记及源码出自`slide/01Linux系统编程入门/02 静态库与动态库`
+本部分笔记及源码出自 `slide/01Linux系统编程入门/02 静态库与动态库`
 
 ### 库
 
 - 库文件是计算机上的一类文件，可以简单的把库文件看成一种代码仓库，它提供给使用者一些**可以直接拿来用的变量、函数或类**
 - 库是特殊的一种程序，编写库的程序和编写一般的程序区别不大，只是**库不能单独运行**
-- 库文件有两种，`静态库`和`动态库（共享库）`。区别是：
+- 库文件有两种，`静态库`和 `动态库（共享库）`。区别是：
   - **静态库**在程序的链接阶段被复制到了程序中
   - **动态库**在链接阶段没有被复制到程序中，而是程序在运行时由系统动态加载到内存中供程序调用
 - 库的好处：**代码保密** 和**方便部署和分发**
@@ -177,17 +165,16 @@
 
   ![image-20210831164707648](01Linux系统编程入门/image-20210831164707648.png)
 
-  1. 生成`.o`文件：`gcc -c 文件名`
+  1. 生成 `.o`文件：`gcc -c 文件名`
 
      ![image-20210831164903714](01Linux系统编程入门/image-20210831164903714.png)
-
-  2. 将`.o`文件打包：`ar rcs libxxx.a xx1.o xx2.o`
+  2. 将 `.o`文件打包：`ar rcs libxxx.a xx1.o xx2.o`
 
      ![image-20210831165142693](01Linux系统编程入门/image-20210831165142693.png)
 
 ### 静态库的使用
 
-- 需要提供**静态库文件和相应的头文件**，有如下结构文件，其中`main.c`测试文件
+- 需要提供**静态库文件和相应的头文件**，有如下结构文件，其中 `main.c`测试文件
 
   ![image-20210831170033041](01Linux系统编程入门/image-20210831170033041.png)
 
@@ -195,7 +182,7 @@
   // main.c
   #include <stdio.h>
   #include "head.h"
-  
+
   int main()
   {
       int a = 20;
@@ -208,25 +195,20 @@
       return 0;
   }
   ```
-
 - 编译运行：`gcc main.c -o app -I ./include -l calc -L ./lib`
 
   - `-I ./include`：指定头文件目录，如果不指定，出现以下错误
 
     ![image-20210831170715090](01Linux系统编程入门/image-20210831170715090.png)
-
   - `-l calc`：指定静态库名称，如果不指定，出现以下错误
 
     ![image-20210831170816127](01Linux系统编程入门/image-20210831170816127.png)
-
   - `-L ./lib`：指定静态库位置，如果不指定，出现以下错误
 
     ![image-20210831170844743](01Linux系统编程入门/image-20210831170844743.png)
-
-  - **正确执行**（成功生成`app`可执行文件）
+  - **正确执行**（成功生成 `app`可执行文件）
 
     ![image-20210831170923394](01Linux系统编程入门/image-20210831170923394.png)
-
   - 测试程序
 
     ![image-20210831193122578](01Linux系统编程入门/image-20210831193122578.png)
@@ -241,18 +223,16 @@
 
   ![image-20210831164707648](01Linux系统编程入门/image-20210831164707648.png)
 
-  1. 生成`.o`文件：`gcc -c -fpic 文件名`
+  1. 生成 `.o`文件：`gcc -c -fpic 文件名`
 
      ![image-20210831173502435](01Linux系统编程入门/image-20210831173502435.png)
-
-  2. 将`.o`文件打包：`gcc -shared xx1.o xx2.o -o libxxx.so`
+  2. 将 `.o`文件打包：`gcc -shared xx1.o xx2.o -o libxxx.so`
 
      ![image-20210831173600480](01Linux系统编程入门/image-20210831173600480.png)
 
 ### 动态库的使用
 
 - 需要提供**动态库文件和相应的头文件**
-
 - 定位动态库（**原因见工作原理->如何定位共享库文件**，其中路径为动态库所在位置）
 
   - 方法一：修改环境变量，**当前终端生效**，退出当前终端失效
@@ -260,58 +240,51 @@
     ```shell
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/u/Desktop/Linux/calc/lib
     ```
-
   - 方法二：修改环境变量，用户级别永久配置
 
     ```shell
     # 修改~/.bashrc
     vim ~/.bashrc
-    
+
     # 在~/.bashrc中添加下行，保存退出
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/u/Desktop/Linux/calc/lib
-    
+
     # 使修改生效
     source ~/.bashrc
     ```
-
   - 方法三：修改环境变量，系统级别永久配置
 
     ```shell
     # 修改/etc/profile
     sudo vim /etc/profile
-    
+
     # 在~/.bashrc中添加下行，保存退出
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/u/Desktop/Linux/calc/lib
-    
+
     # 使修改生效
     source /etc/profile
     ```
-
-  - 方法四：修改`/etc/ld.so.cache文件列表`
+  - 方法四：修改 `/etc/ld.so.cache文件列表`
 
     ```shell
     # 修改/etc/ld.so.conf
     sudo vim /etc/ld.so.conf
-    
+
     # 在/etc/ld.so.conf中添加下行，保存退出
     /home/u/Desktop/Linux/calc/lib
-    
+
     # 更新配置
     sudo ldconfig
     ```
-
-- 有如下结构文件，其中`main.c`测试文件
+- 有如下结构文件，其中 `main.c`测试文件
 
   ![image-20210831173858257](01Linux系统编程入门/image-20210831173858257.png)
-
 - 编译运行：`gcc main.c -o app -I ./include -l calc -L ./lib`
 
   ![image-20210831193101168](01Linux系统编程入门/image-20210831193101168.png)
-
 - 测试程序
 
   ![image-20210831193122578](01Linux系统编程入门/image-20210831193122578.png)
-
 - 如果不将动态库文件绝对路径加入环境变量，则会出现以下错误
 
   ![image-20210831174331780](01Linux系统编程入门/image-20210831174331780.png)
@@ -319,17 +292,14 @@
 ### 工作原理
 
 - 静态库：`GCC` 进行链接时，会把静态库中代码打包到可执行程序中
-
 - 动态库：`GCC` 进行链接时，动态库的代码不会被打包到可执行程序中
-
 - 程序启动之后，动态库会被动态加载到内存中，通过 `ldd （list dynamic dependencies）`命令检查动态库依赖关系
 
   ![image-20210831174842063](01Linux系统编程入门/image-20210831174842063.png)
-
 - 如何定位共享库文件呢？
 
   - 当系统加载可执行代码时候，能够知道其所依赖的库的名字，但是还需要知道**绝对路径**。此时就需要系统的动态载入器来获取该绝对路径
-  - 对于`elf格式`的可执行程序，是由`ld-linux.so`来完成的，它先后搜索`elf文件`的 `DT_RPATH`段 => `环境变量LD_LIBRARY_PATH` => `/etc/ld.so.cache文件列表` => `/lib/`，`usr/lib`目录找到库文件后将其载入内存
+  - 对于 `elf格式`的可执行程序，是由 `ld-linux.so`来完成的，它先后搜索 `elf文件`的 `DT_RPATH`段 => `环境变量LD_LIBRARY_PATH` => `/etc/ld.so.cache文件列表` => `/lib/`，`usr/lib`目录找到库文件后将其载入内存
 
 ### 静态库和动态库的对比
 
@@ -357,19 +327,18 @@
 
 ### 说明
 
-本部分笔记及源码出自`slide/01Linux系统编程入门/03 Makefile`
+本部分笔记及源码出自 `slide/01Linux系统编程入门/03 Makefile`
 
 ### 概念及安装
 
 - 一个工程中的源文件不计其数，其按类型、功能、模块分别放在若干个目录中，`Makefile` 文件定义了一系列的规则来指定哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，因为 `Makefile` 文件就像一个 `Shell` 脚本一样，也可以执行操作系统的命令
 - `Makefile` 带来的好处就是“自动化编译” ，一旦写好，只需要一个 `make` 命令，整个工程完全自动编译，极大的提高了软件开发的效率。
 - `make` 是一个命令工具，是一个解释 `Makefile` 文件中指令的命令工具，一般来说，大多数的 `IDE` 都有这个命令，比如 Delphi 的 `make`，Visual C++ 的 `nmake`，Linux 下 GNU 的 `make`
-- 安装：`sudo apt install make`，安装时会安装`man 手册`
+- 安装：`sudo apt install make`，安装时会安装 `man 手册`
 
 ### Makefile 文件命名和规则
 
 - 文件命名：`makefile` 或者 `Makefile`
-
 - `Makefile` 规则
 
   - 一个 `Makefile` 文件中可以有一个或者多个规则
@@ -379,7 +348,6 @@
     - **目标**：最终要生成的文件（伪目标除外）
     - **依赖**：生成目标所需要的文件或是目标
     - **命令**：通过执行命令对依赖操作生成目标（命令前必须 Tab 缩进）
-
   - `Makefile` 中的其它规则一般都是为第一条规则服务的。
 
 ### Makefile编写方式
@@ -427,27 +395,19 @@ main.o:main.c
 
 ##### 知识点
 
-- 自定义变量：`变量名=变量值`，如`var=hello`
-
+- 自定义变量：`变量名=变量值`，如 `var=hello`
 - 预定义变量
 
   - `AR` : 归档维护程序的名称，默认值为 ar
-
   - `CC `: C 编译器的名称，默认值为 cc
-
   - `CXX` : C++ 编译器的名称，默认值为 g++
-
   - `$@` : 目标的完整名称
-
   - `$<` : 第一个依赖文件的名称
-
   - `$^`: 所有的依赖文件
-
   - 示例
 
     ![image-20210902095418237](01Linux系统编程入门/image-20210902095418237.png)
-
-- 获取变量的值：`$(变量名)`，如`$(var)`
+- 获取变量的值：`$(变量名)`，如 `$(var)`
 
 ##### 示例
 
@@ -504,23 +464,16 @@ $(target):$(src)
 - `$(wildcard PATTERN...)`
 
   - 功能：获取指定目录下指定类型的文件列表
-
   - 参数：PATTERN 指的是某个或多个目录下的对应的某种类型的文件，如果有多个目录，一般使用空格间隔
-
   - 返回：得到的若干个文件的文件列表，文件名之间使用空格间隔
-
   - 示例
 
     ![image-20210902100119333](01Linux系统编程入门/image-20210902100119333.png)
-
 - `$(patsubst <pattern>,<replacement>,<text>)`
 
-  - 功能：查找`<text>`中的单词(单词以“空格”、“Tab”或“回车”“换行”分隔)是否符合模式`<pattern>`，如果匹配的话，则以`<replacement>`替换
-
-  - `<pattern>`可以包括通配符`%`，表示任意长度的字串。如果`<replacement>`中也包含`%`，那么，`<replacement>`中的这个`%`将是`<pattern>`中的那个%所代表的字串。(可以用`\`来转义，以`\%`来表示真实含义的`%`字符)
-
+  - 功能：查找 `<text>`中的单词(单词以“空格”、“Tab”或“回车”“换行”分隔)是否符合模式 `<pattern>`，如果匹配的话，则以 `<replacement>`替换
+  - `<pattern>`可以包括通配符 `%`，表示任意长度的字串。如果 `<replacement>`中也包含 `%`，那么，`<replacement>`中的这个 `%`将是 `<pattern>`中的那个%所代表的字串。(可以用 `\`来转义，以 `\%`来表示真实含义的 `%`字符)
   - 返回：函数返回被替换过后的字符串
-
   - 示例
 
     ![image-20210902100350848](01Linux系统编程入门/image-20210902100350848.png)
@@ -558,22 +511,41 @@ clean:
 
 ![image-20210902104842411](01Linux系统编程入门/image-20210902104842411.png)
 
+### 伪目标
+
+clean其实并不作为一个目标文件，不需要任何依赖。
+
+如下所示，每次make时都会检查clean的依赖是否更新，但此处clean没有依赖，编译器便默认依赖已更新，需要重新生成目标clean。
+
+```makefile
+clean:
+	rm *.o
+```
+
+这时需要我们设置clean为伪目标，这样的话就不会提示clean已是最新
+
+```makefile
+.PHONY:clean
+clean:
+	rm *.o
+```
+
 ### 工作原理
 
 - 命令在执行之前，需要先检查规则中的依赖是否存在
+
   - 如果存在，执行命令
   - 如果不存在，向下检查其它的规则，检查有没有一个规则是用来生成这个依赖的，如果找到了，则执行该规则中的命令
 - 检测更新，在执行规则中的命令时，会比较目标和依赖文件的时间
+
   - 如果依赖的时间比目标的时间晚，需要重新生成目标
   - 如果依赖的时间比目标的时间早，目标不需要更新，对应规则中的命令不需要被执行
-
 - 示例
 
-  - 当修改`main.c`且重新`make`时，如下
+  - 当修改 `main.c`且重新 `make`时，如下
 
     ![image-20210902105119451](01Linux系统编程入门/image-20210902105119451.png)
-
-  - 当不做任何修改且重新`make`时，如下
+  - 当不做任何修改且重新 `make`时，如下
 
     ![image-20210902105057184](01Linux系统编程入门/image-20210902105057184.png)
 
@@ -581,7 +553,7 @@ clean:
 
 ### 说明
 
-本部分笔记及源码出自`slide/01Linux系统编程入门/04 GDB调试`
+本部分笔记及源码出自 `slide/01Linux系统编程入门/04 GDB调试`
 
 ### 概念
 
@@ -595,16 +567,16 @@ clean:
 ### 准备工作
 
 - 使用以下命令编译：`gcc -g -Wall program.c -o program`
+
   - 通常，在为调试而编译时，我们会**关掉编译器的优化选项**（`-O`）， 并打开**调试选项**（`-g`）。另外，`-Wall`在尽量不影响程序行为的情况下选项打开所有warning，也可以发现许多问题，避免一些不必要的 BUG
   - `-g` 选项的作用是在可执行文件中加入源代码的信息，比如可执行文件中第几条机器指令对应源代码的第几行，但并不是把整个源文件嵌入到可执行文件中，所以在调试时必须保证 `gdb` 能找到源文件
-
-- 注：当在 `gdb` 中直接使用`回车`时，会默认执行上一条命令
+- 注：当在 `gdb` 中直接使用 `回车`时，会默认执行上一条命令
 
 ### 常用命令
 
 #### 说明
 
-- `启动与退出`至`查看当前文件代码`使用`test.c`
+- `启动与退出`至 `查看当前文件代码`使用 `test.c`
 - 后续内容使用课件中其他源程序
 
 #### 启动与退出
@@ -673,27 +645,22 @@ int test(int a) {
 - 从默认位置显示：`list/l`
 
   ![image-20210903103920656](01Linux系统编程入门/image-20210903103920656.png)
-
 - 从指定的行显示：`list/l 行号`
 
   ![image-20210903104039928](01Linux系统编程入门/image-20210903104039928.png)
-
 - 从指定的函数显示：`list/l 行号`
 
   ![image-20210903104052483](01Linux系统编程入门/image-20210903104052483.png)
-
 - 注：**查看时会显示前后文**
 
 #### 查看非当前文件代码
 
-- 编译运行并使用`gdb main`
+- 编译运行并使用 `gdb main`
 
   ![image-20210903104949112](01Linux系统编程入门/image-20210903104949112.png)
-
 - 从指定文件指定的行显示：`list/l 文件名:行号`
 
   ![image-20210903105035366](01Linux系统编程入门/image-20210903105035366.png)
-
 - 从指定文件指定的函数显示：`list/l 文件名:函数名`
 
   ![image-20210903105105909](01Linux系统编程入门/image-20210903105105909.png)
@@ -708,8 +675,8 @@ int test(int a) {
 #### 断点操作
 
 - 查看断点：`i/info b/break`
-
 - 设置一般断点
+
   - `b/break 行号`
   - `b/break 函数名`
   - `b/break 文件名:行号`
@@ -749,14 +716,12 @@ int test(int a) {
 
 ### 说明
 
-- 本部分笔记及源码出自`slide/01Linux系统编程入门/05 文件IO`
-
-- 在`Linux`中使用`man 2 API名`查看**Linux系统API**，`man 3 API名`查看**标准C库API**
+- 本部分笔记及源码出自 `slide/01Linux系统编程入门/05 文件IO`
+- 在 `Linux`中使用 `man 2 API名`查看**Linux系统API**，`man 3 API名`查看**标准C库API**
 
   - `man 2 open`
 
     ![image-20210905161448175](01Linux系统编程入门/image-20210905161448175.png)
-
   - `man 3 fopen`
 
     ![image-20210905161518280](01Linux系统编程入门/image-20210905161518280.png)
@@ -772,11 +737,11 @@ int test(int a) {
 ### 虚拟地址空间
 
 - 虚拟地址空间是为了解决内存加载问题
-  - 问题1：假设实际内存为`4G`，此时共有`1G`、`2G`、`2G`三个程序，如果直接加载，那么第三个程序由于内存不足而无法执行
-  - 问题2：当问题1的`1G`程序执行完后，释放内存，第三个程序可以执行，但此时内存空间不连续
 
-- 对于32位机器来说，大小约为$2^{32}$，即`4G`左右，对于64位机器来说，，大小约为$2^{48}$，即`256T`左右
-- 通过`CPU中的MMU(内存管理单元)`将虚拟内存地址映射到物理内存地址上
+  - 问题1：假设实际内存为 `4G`，此时共有 `1G`、`2G`、`2G`三个程序，如果直接加载，那么第三个程序由于内存不足而无法执行
+  - 问题2：当问题1的 `1G`程序执行完后，释放内存，第三个程序可以执行，但此时内存空间不连续
+- 对于32位机器来说，大小约为$2^{32}$，即 `4G`左右，对于64位机器来说，，大小约为$2^{48}$，即 `256T`左右
+- 通过 `CPU中的MMU(内存管理单元)`将虚拟内存地址映射到物理内存地址上
 
 ![image-20210905151755982](01Linux系统编程入门/image-20210905151755982.png)
 
@@ -791,12 +756,12 @@ int test(int a) {
 
 #### open & close
 
-- `int open(const char *pathname, int flags);`，使用`man 2 open`查看帮助
+- `int open(const char *pathname, int flags);`，使用 `man 2 open`查看帮助
 
   - 参数
     - `pathname`：要打开的文件路径
     - `flags`：对文件的操作权限设置还有其他的设置(`O_RDONLY,`  `O_WRONLY,`  `O_RDWR`  这三个设置是互斥的，代表只读，只写，可读可写)
-  - 返回值：返回一个新的文件描述符，如果调用失败，返回-1，并设置`errno`，`errno`属于Linux系统函数库里面的一个全局变量，记录的是最近的错误号
+  - 返回值：返回一个新的文件描述符，如果调用失败，返回-1，并设置 `errno`，`errno`属于Linux系统函数库里面的一个全局变量，记录的是最近的错误号
 
   ```c
   /*
@@ -804,7 +769,7 @@ int test(int a) {
       void perror(const char *s);作用：打印errno对应的错误描述
           参数s：用户描述，比如hello, 最终输出的内容是  hello:xxx(实际的错误描述)
   */
-  
+
   #include <stdio.h>
   // 系统宏
   #include <sys/types.h>
@@ -813,25 +778,24 @@ int test(int a) {
   #include <fcntl.h>
   // close函数声明头文件
   #include <unistd.h>
-  
+
   int main() 
   {
       // 打开一个文件
       int fd = open("a.txt", O_RDONLY);
-  
+
       if(fd == -1) {
           perror("open");
       }
       // 读写操作
-  
+
       // 关闭
       close(fd);
-  
+
       return 0;
   }
   ```
-
-- `int open(const char *pathname, int flags, mode_t mode);`，使用`man 2 open`查看帮助
+- `int open(const char *pathname, int flags, mode_t mode);`，使用 `man 2 open`查看帮助
 
   - 参数
     - `pathname`：要创建的文件的路径
@@ -856,28 +820,27 @@ int test(int a) {
   #include <fcntl.h>
   #include <unistd.h>
   #include <stdio.h>
-  
+
   int main() 
   {
       // 创建一个新的文件
       int fd = open("create.txt", O_RDWR | O_CREAT, 0777);
-  
+
       if(fd == -1) {
           perror("open");
       }
-  
+
       // 关闭
       close(fd);
-  
+
       return 0;
   }
   ```
-
 - `int close(int fd);`
 
 #### read & write
 
-- `ssize_t read(int fd, void *buf, size_t count);`，使用`man 2 read`查看帮助
+- `ssize_t read(int fd, void *buf, size_t count);`，使用 `man 2 read`查看帮助
   - 参数
     - `fd`：文件描述符，open得到的，通过这个文件描述符操作某个文件
     - `buf`：需要读取数据存放的地方，数组的地址（传出参数）
@@ -887,14 +850,14 @@ int test(int a) {
       - `> 0`: 返回实际的读取到的字节数
       - `= 0`：文件已经读取完了
     - 失败：-1
-- `ssize_t write(int fd, const void *buf, size_t count);`，使用`man 2 write`查看帮助
+- `ssize_t write(int fd, const void *buf, size_t count);`，使用 `man 2 write`查看帮助
   - 参数
     - `fd`：文件描述符，open得到的，通过这个文件描述符操作某个文件
     - `buf`：要往磁盘写入的数据
     - `count`：要写的数据的实际的大小
   - 返回值
     - 成功：实际写入的字节数
-    - 失败：返回-1，并设置`errno`
+    - 失败：返回-1，并设置 `errno`
 
 ```c
 #include <unistd.h>
@@ -937,7 +900,7 @@ int main()
 
 #### lseek
 
-- `off_t lseek(int fd, off_t offset, int whence);`，使用`man 2 lseek`查看帮助
+- `off_t lseek(int fd, off_t offset, int whence);`，使用 `man 2 lseek`查看帮助
 
 ```c
 /*  
@@ -1013,21 +976,17 @@ int main()
 - 扩展前
 
   ![image-20210905182600860](01Linux系统编程入门/image-20210905182600860.png)
-
 - 扩展后（原先为5个字节，扩展100个字节，然后写入一个字节）
 
   ![image-20210905182955313](01Linux系统编程入门/image-20210905182955313.png)
 
 #### stat & lstat(获取文件信息及软链接信息)
 
-- `int stat(const char *pathname, struct stat *statbuf);`，使用`man 2 stat`查看帮助
-
-- `int lstat(const char *pathname, struct stat *statbuf);`，使用`man 2 lstat`查看帮助
-
+- `int stat(const char *pathname, struct stat *statbuf);`，使用 `man 2 stat`查看帮助
+- `int lstat(const char *pathname, struct stat *statbuf);`，使用 `man 2 lstat`查看帮助
 - Linux命令：`stat`
 
   ![image-20210905184130981](01Linux系统编程入门/image-20210905184130981.png)
-
 - `stat`结构体
 
   ```c
@@ -1100,7 +1059,7 @@ int main()
 }
 ```
 
-#### 模拟实现`ls -l`
+#### 模拟实现 `ls -l`
 
 ```c
 #include <stdio.h>
@@ -1273,8 +1232,8 @@ int main()
 
 - `int chown(const char *path, uid_t owner, gid_t group);`
   - 修改文件所有者
-  - 可使用`vim /etc/passwd`查看有哪些用户
-  - 可使用`vim /etc/group`查看有哪些组
+  - 可使用 `vim /etc/passwd`查看有哪些用户
+  - 可使用 `vim /etc/group`查看有哪些组
 
 #### truncate
 
@@ -1374,7 +1333,6 @@ int main()
 #### chdir & getcwd
 
 - `int chdir(const char *path);`
-
 - `char *getcwd(char *buf, size_t size);`
 
 ```c
@@ -1430,7 +1388,7 @@ int main()
     char buf1[128];
     getcwd(buf1, sizeof(buf1));
     printf("当前的工作目录是：%s\n", buf1);
-    
+  
     return 0;
 }
 ```
@@ -1438,11 +1396,8 @@ int main()
 ### 目录遍历函数
 
 - 打开一个目录：`DIR *opendir(const char *name);`
-
 - 读取目录中的数据：`struct dirent *readdir(DIR *dirp);`
-
 - 关闭目录：`int closedir(DIR *dirp);`
-
 - `dirent` 结构体和 `d_type`
 
   ```c
@@ -1464,7 +1419,6 @@ int main()
   - `d_type`
 
     ![image-20210908203416289](01Linux系统编程入门/image-20210908203416289.png)
-
 - **读取文件夹文件数目**实例
 
   ```c
@@ -1478,8 +1432,8 @@ int main()
           返回值：
               DIR * 类型，理解为目录流
               错误返回NULL
-  
-  
+
+
       // 读取目录中的数据
       #include <dirent.h>
       struct dirent *readdir(DIR *dirp);
@@ -1487,21 +1441,21 @@ int main()
           - 返回值：
               struct dirent，代表读取到的文件的信息
               读取到了末尾或者失败了，返回NULL
-  
+
       // 关闭目录
       #include <sys/types.h>
       #include <dirent.h>
       int closedir(DIR *dirp);
-  
+
   */
   #include <sys/types.h>
   #include <dirent.h>
   #include <stdio.h>
   #include <string.h>
   #include <stdlib.h>
-  
+
   int getFileNum(const char * path);
-  
+
   // 读取某个目录下所有的普通文件的个数
   int main(int argc, char * argv[]) 
   {
@@ -1509,40 +1463,40 @@ int main()
           printf("%s path\n", argv[0]);
           return -1;
       }
-  
+
       int num = getFileNum(argv[1]);
-  
+
       printf("普通文件的个数为：%d\n", num);
-  
+
       return 0;
   }
-  
+
   // 用于获取目录下所有普通文件的个数
   int getFileNum(const char * path) {
-  
+
       // 1.打开目录
       DIR * dir = opendir(path);
-  
+
       if(dir == NULL) {
           perror("opendir");
           exit(0);
       }
-  
+
       struct dirent *ptr;
-  
+
       // 记录普通文件的个数
       int total = 0;
-  
+
       while((ptr = readdir(dir)) != NULL) {
-  
+
           // 获取名称
           char * dname = ptr->d_name;
-  
+
           // 忽略掉. 和..
           if(strcmp(dname, ".") == 0 || strcmp(dname, "..") == 0) {
               continue;
           }
-  
+
           // 判断是否是普通文件还是目录
           if(ptr->d_type == DT_DIR) {
               // 目录,需要继续读取这个目录
@@ -1550,21 +1504,21 @@ int main()
               sprintf(newpath, "%s/%s", path, dname);
               total += getFileNum(newpath);
           }
-  
+
           if(ptr->d_type == DT_REG) {
               // 普通文件
               total++;
           }
       }
-  
+
       // 关闭目录
       closedir(dir);
-  
+
       return total;
   }
   ```
 
-### 文件描述符之`dup`、`dup2`
+### 文件描述符之 `dup`、`dup2`
 
 #### dup
 
@@ -1706,7 +1660,7 @@ int main()
               可选性：O_APPEND, O_NONBLOCK
                 O_APPEND 表示追加数据
                 NONBLOK 设置成非阻塞
-        
+      
         阻塞和非阻塞：描述的是函数调用的行为。
 */
 
@@ -1751,6 +1705,3 @@ int main()
     return 0;
 }
 ```
-
-
-
