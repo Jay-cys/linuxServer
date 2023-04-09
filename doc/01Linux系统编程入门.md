@@ -743,6 +743,16 @@ int test(int a) {
 - 对于32位机器来说，大小约为$2^{32}$，即 `4G`左右，对于64位机器来说，，大小约为$2^{48}$，即 `256T`左右
 - 通过 `CPU中的MMU(内存管理单元)`将虚拟内存地址映射到物理内存地址上
 
+> 受保护的地址：NULL、nullptr
+>
+> 堆空间：new、malloc的数据空间一般就放在此处，从下往上，由低地址往高地址存
+>
+> 栈空间：存放宏定义变量等，从上往下，由高地址往低地址存
+>
+> 内核区：普通用户是没有权限读写内核区的数据内容的
+>
+> - 想要读取内核区的数据，需要通过系统调用，即系统的API函数，如C的库函数 fopen 调用linux系统 open 函数
+
 ![image-20210905151755982](01Linux系统编程入门/image-20210905151755982.png)
 
 ### 文件描述符
@@ -750,13 +760,21 @@ int test(int a) {
 - 文件描述符表是一个**数组**，为了一个进程能够同时操作多个文件
 - 文件描述符表默认大小：1024
 
+> 文件描述符的前三个地址是固定的，分别代表标准输入、标准输出、标准错误，并且默认是打开的，与当前终端是绑定的
+>
+> 一个文件可以被多个进程所打开，但是其对应的文件描述符是不一样的
+>
+> 当使用 fclose 或者使用linux系统函数 close 时，文件描述符才会被释放掉
+>
+> 图中打开新文件，会去寻找空闲的最小的文件描述符，这个是系统内核自动实现的
+
 ![image-20210905160958789](01Linux系统编程入门/image-20210905160958789.png)
 
 ### Linux 系统 IO 函数
 
 #### open & close
 
-- `int open(const char *pathname, int flags);`，使用 `man 2 open`查看帮助
+- `int open(const char *pathname, int flags);`，使用 `man 2 open` 查看帮助（打开已有的文件）
 
   - 参数
     - `pathname`：要打开的文件路径
@@ -795,7 +813,7 @@ int test(int a) {
       return 0;
   }
   ```
-- `int open(const char *pathname, int flags, mode_t mode);`，使用 `man 2 open`查看帮助
+- `int open(const char *pathname, int flags, mode_t mode);`，使用 `man 2 open` 查看帮助（创建新文件并打开）
 
   - 参数
     - `pathname`：要创建的文件的路径
@@ -1660,7 +1678,7 @@ int main()
               可选性：O_APPEND, O_NONBLOCK
                 O_APPEND 表示追加数据
                 NONBLOK 设置成非阻塞
-      
+    
         阻塞和非阻塞：描述的是函数调用的行为。
 */
 
