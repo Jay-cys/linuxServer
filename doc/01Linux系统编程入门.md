@@ -1045,6 +1045,8 @@ int main()
             失败：返回-1 设置errno
 
     int lstat(const char *pathname, struct stat *statbuf);
+	作用：返回软链接的文件信息
+	      可能有一个b.txt 指向 a.txt (ln -s a.txt b.txt)，如果使用命令stat b.txt，那么获取的是a.txt的文件信息
         参数:
             - pathname：操作的文件的路径
             - statbuf：结构体变量，传出参数，用于保存获取到的文件的信息
@@ -1678,7 +1680,7 @@ int main()
               可选性：O_APPEND, O_NONBLOCK
                 O_APPEND 表示追加数据
                 NONBLOK 设置成非阻塞
-    
+  
         阻塞和非阻塞：描述的是函数调用的行为。
 */
 
