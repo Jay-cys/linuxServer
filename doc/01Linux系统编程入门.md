@@ -1170,7 +1170,8 @@ int main(int argc, char * argv[])
 
     // 获取修改的时间
     char* time = ctime(&st.st_mtime);
-
+  
+    // 默认结尾有换行符
     char mtime[512] = {0};
     strncpy(mtime, time, strlen(time) - 1);
 
@@ -1252,8 +1253,8 @@ int main()
 
 - `int chown(const char *path, uid_t owner, gid_t group);`
   - 修改文件所有者
-  - 可使用 `vim /etc/passwd`查看有哪些用户
-  - 可使用 `vim /etc/group`查看有哪些组
+  - 可使用 `vim /etc/passwd` 查看有哪些用户
+  - 可使用 `vim /etc/group` 查看有哪些组
 
 #### truncate
 
@@ -1725,3 +1726,9 @@ int main()
     return 0;
 }
 ```
+
+问题，close() 到底关闭的是什么？
+
+有两个文件描述符 fd1 和 fd2 都指向1.txt
+
+执行 close(fd1) 之后，为什么还能根据 fd2 对 1.txt 进行操作
