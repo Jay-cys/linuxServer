@@ -790,7 +790,7 @@ int main() {
 
                 printf("child die, pid = %d\n", ret);
             }
-     
+   
         }
 
     } else if (pid == 0){
@@ -1846,13 +1846,13 @@ int main()
 - `unsigned int alarm(unsigned int seconds);`
 
   - 使用 `man 2 alarm`查看帮助
-  - 功能：设置定时器（闹钟）。函数调用，开始倒计时，当倒计时为0的时候，函数会给当前的进程发送一个信号：`SIGALARM`
+  - 功能：设置定时器（闹钟）。函数调用，开始倒计时，当倒计时为0的时候，函数会给当前的进程发送一个信号：`SIGALRM`
   - 参数：`seconds`，倒计时的时长，单位：秒。如果参数为0，定时器无效（不进行倒计时，不发信号）
   - 取消一个定时器，通过 `alarm(0)`
   - 返回值
     - 之前没有定时器，返回0
     - 之前有定时器，返回之前的定时器剩余的时间
-- `SIGALARM` ：默认终止**当前的进程**，每一个进程都有且只有唯一的一个定时器
+- `SIGALRM` ：默认终止**当前的进程**，每一个进程都有且只有唯一的一个定时器
 - 定时器，与进程的状态无关（自然定时法）。无论进程处于什么状态，alarm都会计时，即**函数不阻塞**
 
 ```c
@@ -1876,6 +1876,12 @@ int main() {
 ```
 
 ![image-20211005200623331](02Linux多进程开发/image-20211005200623331.png)
+
+> 利用alarm函数考察1s中cpu能计数多少次，实际情况中会出现，打印的 i 的时间超过 1s ，因为程序打印会有缓冲且需要时间
+>
+> 实际1s的时间 = 内核时间 + 用户时间 + 消耗的时间
+>
+> 其中，内核时间和用户时间都是在内存中的，效率很高，故占比低，而文件IO消耗的时间效率很低，需要和磁盘（硬件）打交道
 
 - `int setitimer(int which, const struct itimerval *new_val, struct itimerval *old_value);`
 
@@ -1945,71 +1951,92 @@ int main() {
 
 ### signal
 
-- `sighandler_t signal(int signum, sighandler_t handler);`
 
-  - 使用 `man 2 signal`查看帮助
-  - 功能：设置某个信号的捕捉行为
-  - 参数
-    - `signum`: 要捕捉的信号
-    - `handler`: 捕捉到信号要如何处理
-      - `SIG_IGN` ： 忽略信号
-      - `SIG_DFL` ： 使用信号默认的行为
-      - `自定义回调函数`
-    - 返回值
-      - 成功，返回上一次注册的信号处理函数的地址。第一次调用返回NULL
-      - 失败，返回SIG_ERR，设置错误号
-      - 注意：返回值定义在宏 `__USE_GNU`中，需要指定或者直接在程序中使用 `typedef __sighandler_t sighandler_t;`
-    - `SIGKILL`和 `SIGSTOP`不能被捕捉，不能被忽略
-- 完善**过3秒以后，每隔2秒钟定时一次的定时器功能**
+`sighandler_t signal(int signum, sighandler_t handler);`
 
-  ```c
-  #include <sys/time.h>
-  #include <stdio.h>
-  #include <stdlib.h>
-  #include <signal.h>
-
-  void myalarm(int num) {
-      printf("捕捉到了信号的编号是：%d\n", num);
-      printf("xxxxxxx\n");
-  }
-
-  // 过3秒以后，每隔2秒钟定时一次
-  int main() 
-  {
-
-      // 注册信号捕捉
-      // signal(SIGALRM, SIG_IGN);
-      // signal(SIGALRM, SIG_DFL);
-      // void (*sighandler_t)(int); 函数指针，int类型的参数表示捕捉到的信号的值
-      // 捕捉的信号右定时器发出
-      signal(SIGALRM, myalarm);
-
-      struct itimerval new_value;
-
-      // 设置间隔的时间
-      new_value.it_interval.tv_sec = 2;
-      new_value.it_interval.tv_usec = 0;
-
-      // 设置延迟的时间,3秒之后开始第一次定时
-      new_value.it_value.tv_sec = 3;
-      new_value.it_value.tv_usec = 0;
+- 使用 `man 2 signal`查看帮助
+- 功能：设置某个信号的捕捉行为
+- 参数
+  - `signum`: 要捕捉的信号
+  - `handler`: 捕捉到信号要如何处理
+    - `SIG_IGN` ： 忽略信号
+    - `SIG_DFL` ： 使用信号默认的行为
+    - `自定义回调函数`
+  - 返回值
+    - 成功，返回上一次注册的信号处理函数的地址。第一次调用返回NULL
+    - 失败，返回SIG_ERR，设置错误号
+    - 注意：返回值定义在宏 `__USE_GNU`中，需要指定或者直接在程序中使用 `typedef __sighandler_t sighandler_t;`
+  - `SIGKILL`和 `SIGSTOP`不能被捕捉，不能被忽略
 
 
-      int ret = setitimer(ITIMER_REAL, &new_value, NULL); // 非阻塞的
-      printf("定时器开始了...\n");
+完善**过3秒以后，每隔2秒钟定时一次的定时器功能**
 
-      if(ret == -1) {
-          perror("setitimer");
-          exit(0);
-      }
+```c
+#include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
 
-      getchar();
+void myalarm(int num) {
+    printf("捕捉到了信号的编号是：%d\n", num);
+    printf("xxxxxxx\n");
+}
 
-      return 0;
-  }
-  ```
+// 过3秒以后，每隔2秒钟定时一次
+int main() 
+{
 
-  ![image-20211006100149339](02Linux多进程开发/image-20211006100149339.png)
+    // 注册信号捕捉
+    // signal(SIGALRM, SIG_IGN);
+    // signal(SIGALRM, SIG_DFL);
+    // void (*sighandler_t)(int); 函数指针，int类型的参数表示捕捉到的信号的值
+    // 捕捉的信号右定时器发出
+    signal(SIGALRM, myalarm);
+
+    struct itimerval new_value;
+
+    // 设置间隔的时间
+    new_value.it_interval.tv_sec = 2;
+    new_value.it_interval.tv_usec = 0;
+
+    // 设置延迟的时间,3秒之后开始第一次定时
+    new_value.it_value.tv_sec = 3;
+    new_value.it_value.tv_usec = 0;
+
+
+    int ret = setitimer(ITIMER_REAL, &new_value, NULL); // 非阻塞的
+    printf("定时器开始了...\n");
+
+    if(ret == -1) {
+        perror("setitimer");
+        exit(0);
+    }
+
+    getchar();
+
+    return 0;
+}
+```
+
+![image-20211006100149339](02Linux多进程开发/image-20211006100149339.png)
+
+> 函数指针与函数
+>
+> `void (*sighandler_t)(int);` 返回的是函数指针
+>
+> `void *sighandler_t (int);` 返回的是函数
+
+> vscode报错头文件找不到的原因？
+>
+> sighandler_t无效的原因看头文件可以发现如下内容：
+>
+> #ifdef __USE_GNU
+>
+> typedef __sighandler_t sighandler_t;
+>
+> #endif
+>
+> 需要定义_USE_GNU宏才可以，在#include<signal.h>之前加上#define __USE_GNU
 
 ### sigaction
 
