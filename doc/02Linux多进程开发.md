@@ -790,7 +790,7 @@ int main() {
 
                 printf("child die, pid = %d\n", ret);
             }
-       
+     
         }
 
     } else if (pid == 0){
@@ -1492,7 +1492,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   |   `prot`   |          `open`          |
   | :-----------: | :------------------------: |
   | `PROT_READ` | `O_RDONLY` 或 `O_RDWR` |
-  |  `PROT_READ  |        PROT_WRITE`        |
+  | `PROT_READ` |       `PROT_WRITE`       |
 - 内存映射区通信，是非阻塞
 - 一个文件对应一个内存映射区
 - 如果对 `mmap`的返回值(`ptr`)做 `++操作(ptr++)`, `munmap`是否能够成功?
@@ -1515,7 +1515,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   - 可以的，但是创建的文件的大小如果为0的话，肯定不行(因为 `mmap`调用时，长度不允许为0)
 - `mmap`后关闭文件描述符，对 `mmap`映射有没有影响？
 
-  - 映射区还存在，创建映射区的 `fd`被关闭，没有任何影响
+  - 映射区还存在，创建映射区的 `fd`被关闭，没有任何影响，因为你使用mmap时会对文件进行拷贝
 - 对 `ptr`越界操作会怎样？
 
   - 越界操作操作的是非法的内存 -> 段错误
@@ -2354,7 +2354,7 @@ int main()
 
         // 注册完信号捕捉以后，解除阻塞
         sigprocmask(SIG_UNBLOCK, &set, NULL);
-    
+  
         while (1) {
             printf("parent process : %d\n", getpid());
             sleep(2);
