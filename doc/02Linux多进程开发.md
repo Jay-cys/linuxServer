@@ -1734,8 +1734,8 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
 
 ## 信号一览表及特点
 
-- 可通过 `man 7 signal`查看帮助
-- 信号的 5 中默认处理动作
+- 可通过 `man 7 signal` 查看帮助
+- 信号的 5 种默认处理动作
   - `Term`：终止进程
   - `Ign`：当前进程忽略掉这个信号
   - `Core`：终止进程，并生成一个Core文件
@@ -1805,8 +1805,8 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   - 参数：`sig` : 要发送的信号
   - 返回值：0成功，非0失败
 - `void abort(void);`
-  - 使用 `man 3 abort`查看帮助
-  - 功能： 发送 `SIGABRT`信号给当前的进程，**杀死当前进程**
+  - 使用 `man 3 abort` 查看帮助
+  - 功能： 发送 `SIGABRT` 信号给当前的进程，**杀死当前进程**
 
 ```c
 #include <stdio.h>

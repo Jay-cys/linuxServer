@@ -2,7 +2,7 @@
 
 ## 系统配置
 
-1. 在虚拟机中安装Linux系统，本项目采用 `VMware Workstation 16.1.2`和 `Ubuntu 18.04`，本机系统为 `Win 10`
+1. 在虚拟机中安装Linux系统，本项目采用 `VMware Workstation 16.1.2` 和 `Ubuntu 18.04`，本机系统为 `Win 10`
 2. 更新 `Ubuntu 18.04`源并安装 `open-vm-tools`
 
    1. 进入 `/etc/apt/sources.list` 修改为国内镜像源（速度快），全部删除，替换为下述内容，如果更新报错，将 `https`换成 `http`
@@ -31,9 +31,9 @@
       # sudo apt upgrade
       ```
    3. 安装 `open-vm-tools`：`sudo apt install open-vm-tools`
-   4. ~~如果要实现文件夹共享，需要安装 `open-vm-tools-dkms`：`sudo apt install open-vm-tools-dkms`~~=>清华源找不到 `open-vm-tools-dkms`，不安装不影响
-   5. 桌面环境还需要安装 `open-vm-tools-desktop`以支持双向拖放文件：`sudo apt install open-vm-tools-desktop`
-   6. 重启（使用 `VMware`自带重启，使用 `reboot`重启可能失败）后成功进行拖拽复制
+   4. 如果要实现文件夹共享，需要安装 `open-vm-tools-dkms`：`sudo apt install open-vm-tools-dkms`=>清华源找不到 `open-vm-tools-dkms`，不安装不影响
+   5. 桌面环境还需要安装 `open-vm-tools-desktop` 以支持双向拖放文件：`sudo apt install open-vm-tools-desktop`
+   6. 重启（使用 `VMware` 自带重启，使用 `reboot` 重启可能失败）后成功进行拖拽复制
 
    注：[参考链接](https://blog.csdn.net/hhdhz/article/details/87922794)
 3. 在 `Ubuntu 18.10`安装必要组件
