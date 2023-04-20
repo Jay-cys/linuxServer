@@ -1154,6 +1154,7 @@ void* consumer(void* arg) {
     return NULL;
 }
 
+
 int main()
 {
     // 初始化互斥锁
@@ -1182,6 +1183,24 @@ int main()
     pthread_mutex_destroy(&mutex);
     pthread_exit(NULL);     // 回收主线程
     return 0;
+}
+```
+
+上面程序中，消费者函数改为如下会更好
+
+```c
+void *customer(void *arg)
+{
+    while(1){
+        pthread_mutex_lock(&mutex);
+        // 当这个函数调用阻塞的时候，会对互斥锁进行解锁，以便生产者进行生产，当不阻塞时，继续向下执行，会重新加锁。
+        pthread_cond_wait(&cond, &mutex);
+        struct Node * temp = head;
+        head = head->next;
+        printf("del node : %d, ctid %ld\n", temp->num, pthread_self());
+        free(temp);
+        pthread_mutex_unlock(&mutex);
+    }
 }
 ```
 
