@@ -59,7 +59,7 @@
 
   ![image-20211024092845797](03Linux多线程开发/image-20211024092845797.png)
 
-### 注意 
+### 注意
 
 - 由于 `pthread`属于第三方库，所以在编译时需要加上参数 `-pthread`或 `-lpthread`即指定包路径，如果不加报以下错误（执行程序为线程创建）
 
@@ -128,7 +128,7 @@ int main()
 ## 线程终止
 
 - `void pthread_exit(void *retval);`
-  - 通过 `man 3 pthread_exit`查看帮助
+  - 通过 `man 3 pthread_exit` 查看帮助
   - 功能：终止一个线程，在哪个线程中调用，就表示终止哪个线程
   - 参数：`retval`，需要传递一个指针，作为一个返回值，可以在 `pthread_join()`中获取到
 
@@ -251,7 +251,7 @@ int main()
   - 参数：需要分离的线程的ID
   - 返回值
     - 成功：0
-    - 失败：返回错误号。这个错误号和之前 `errno`不太一样。获取错误号的信息：  `char * strerror(int errnum);`
+    - 失败：返回错误号。这个错误号和之前 `errno` 不太一样。获取错误号的信息：  `char * strerror(int errnum);`
 
 ```c
 #include <stdio.h>
@@ -637,7 +637,7 @@ void * sellticket(void * arg) {
             pthread_mutex_unlock(&mutex);
             break;
         }
-      
+    
     }
 
     return NULL;
@@ -1122,7 +1122,7 @@ void* producter(void* arg) {
         newNode->next = head;
         head = newNode;
         printf("add node, num : %d, tid : %ld\n", newNode->val, pthread_self());
-      
+  
         // 只要生产了一个，就通知消费者消费
         pthread_cond_signal(&cond);
 
@@ -1146,7 +1146,7 @@ void* consumer(void* arg) {
             usleep(100);
         } else {
             // 没有数据，需要等待
-            // 当这个函数调用阻塞的时候，会对互斥锁进行解锁，当不阻塞的，继续向下执行，会重新加锁。
+            // 当这个函数调用阻塞的时候，会对互斥锁进行解锁，以便生产者进行生产，当不阻塞时，继续向下执行，会重新加锁。
             pthread_cond_wait(&cond, &mutex);
             pthread_mutex_unlock(&mutex);
         }
@@ -1212,94 +1212,99 @@ int main()
 
 - 不需要单独判断 `容器`为空的情况
 
+> 下面程序中，必须先判断信号量再上锁。如果先上锁后判断信号量，就会出现死锁现象，因为上锁后，若信号量为0，那么就处于阻塞状态，此时若其他线程抢占CPU资源，就会出现死锁现象。
+
 ```c
-#include <stdio.h>
+#include <semaphore.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
-#include <semaphore.h>
 
-// 链表作为容器
-struct Node{
-    int val;
-    struct Node* next;
+struct Node
+{
+    int num;
+    struct Node *next;
 };
 
-// 头结点
-struct Node* head = NULL;
+struct Node *head = NULL;
 
-// 互斥量
+// 创建互斥量
 pthread_mutex_t mutex;
-// 信号量
-sem_t psem;
-sem_t csem;
+// 创建信号量
+sem_t psem, csem;
 
-// 头插法增加元素
-void* producter(void* arg) {
-    while (1) {
+void *producer(void *arg)
+{
+    while (1)
+    {
+        // 必须先判断信号量再上锁，否则会出现死锁现象
         sem_wait(&psem);
         pthread_mutex_lock(&mutex);
-        struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-        newNode->val = rand() % 1000;
+        struct Node *newNode = (struct Node *)malloc(sizeof(head));
         newNode->next = head;
+        newNode->num = rand() % 10000;
         head = newNode;
-        printf("add node, num : %d, tid : %ld\n", newNode->val, pthread_self());
+        printf("add Node %d, ptid %ld\n", newNode->num, pthread_self());
         pthread_mutex_unlock(&mutex);
         sem_post(&csem);
     }
-    return NULL;
 }
 
-// 头删法减少元素
-void* consumer(void* arg) {
-    while (1) {
+void *custumer(void *arg)
+{
+    while (1)
+    {
+        // 必须先判断信号量再上锁，否则会出现死锁现象
         sem_wait(&csem);
         pthread_mutex_lock(&mutex);
-        struct Node* tmp = head;
-        // 当链表不为空时，才能删除
-        if (head != NULL) {
-            head = head->next;
-            printf("del node, num : %d, tid : %ld\n", tmp->val, pthread_self());
-            free(tmp);
-            pthread_mutex_unlock(&mutex);
-            sem_post(&psem);
-        }
+        struct Node *temp = head;
+        head = head->next;
+        printf("del Node %d, ctid %ld\n", temp->num, pthread_self());
+        free(temp);
+        pthread_mutex_unlock(&mutex);
+        sem_post(&psem);
+        // usleep(100);
     }
-    return NULL;
 }
 
 int main()
 {
-    // 初始化互斥锁
+    // 初始化互斥量
     pthread_mutex_init(&mutex, NULL);
     // 初始化信号量
-    // 最多生产8个
     sem_init(&psem, 0, 8);
-    // 初始没有东西可以消费
     sem_init(&csem, 0, 0);
 
-    // 创建5个生产者线程，和5个消费者线程
-    pthread_t products[5], consumes[5];
-    for (int i = 0; i < 5; i++) {
-        pthread_create(&products[i], NULL, producter, NULL);
-        pthread_create(&consumes[i], NULL, consumer, NULL);
+    pthread_t ptid[5], ctid[5];
+
+    // 创建5个生产者线程和消费者线程
+    for (int i = 0; i < 5; ++i)
+    {
+        pthread_create(&ptid[i], NULL, producer, NULL);
+        pthread_create(&ctid[i], NULL, custumer, NULL);
     }
 
-    // 分离，回收线程资源
-    for (int i = 0; i < 5; i++) {
-        pthread_detach(products[i]);
-        pthread_detach(consumes[i]);
+    // 线程脱离
+    for (int i = 0; i < 5; ++i)
+    {
+        pthread_detach(ptid[i]);
+        pthread_detach(ctid[i]);
     }
 
-    while (1) {
-        sleep(10);
-    }
+    // 死循环，确保互斥量不被回收，子线程正常运行
+    while (1)
+        ;
+
     // 回收信号量
-    sem_destroy(&csem);
     sem_destroy(&psem);
-    // 回收互斥锁
+    sem_destroy(&csem);
+    // 回收互斥量
     pthread_mutex_destroy(&mutex);
-    pthread_exit(NULL);     // 回收主线程
+
+    // 主线程退出
+    pthread_exit(NULL);
+
     return 0;
 }
 ```
