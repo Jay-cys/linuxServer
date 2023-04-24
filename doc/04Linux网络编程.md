@@ -432,7 +432,7 @@ int main()
   n  - network 网络字节序 
   s  - short unsigned short 
   l  - long unsigned int
-
+  
   #include <arpa/inet.h> 
   // 转换端口，端口为16位
   uint16_t htons(uint16_t hostshort); // 主机字节序 => 网络字节序 
@@ -446,7 +446,7 @@ int main()
   ```c
   #include <stdio.h>
   #include <arpa/inet.h>
-
+  
   int main()
   {
       // 主机字节序转网络字节序
@@ -459,7 +459,7 @@ int main()
           printf("%d ", *(p1 + i));
       }
       printf("\n");
-
+  
       // 端口转换
       unsigned short port1 = 0x0102;
       unsigned short conv_port1 = htons(port1);
@@ -476,7 +476,7 @@ int main()
           printf("%d ", *(p2 + i));
       }
       printf("\n");
-
+  
       // 端口转换
       unsigned short port2 = 0x0201;
       unsigned short conv_port2 = htons(port2);
@@ -505,7 +505,7 @@ int main()
       sa_family_t sa_family; 
       char sa_data[14]; 
   };
-
+  
   typedef unsigned short int sa_family_t;
   ```
 - `sa_family`
@@ -539,7 +539,7 @@ int main()
         unsigned long int __ss_align; 
         char __ss_padding[ 128 - sizeof(__ss_align) ]; 
     };
-
+    
     typedef unsigned short int sa_family_t;
     ```
 
@@ -649,7 +649,7 @@ typedef uint32_t in_addr_t;
           af:地址族： AF_INET  AF_INET6
           src:需要转换的点分十进制的IP字符串
           dst:转换后的结果保存在这个里面
-
+  
       // 将网络字节序的整数，转换成点分十进制的IP地址字符串
       const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
           af:地址族： AF_INET  AF_INET6
@@ -657,16 +657,16 @@ typedef uint32_t in_addr_t;
           dst: 转换成IP地址字符串保存的地方
           size：第三个参数的大小（数组的大小）
           返回值：返回转换后的数据的地址（字符串），和 dst 是一样的
-
+  
   */
   #include <stdio.h>
   #include <arpa/inet.h>
-
+  
   int main(){
       // 创建一个ip字符串,点分十进制的IP地址字符串
       char buf[] = "192.168.1.1";
       unsigned int num = 0;
-
+  
       // 将点分十进制的IP字符串转换成网络字节序的整数
       inet_pton(AF_INET, buf, &num);
       printf("转换成的网络字节序：%d\n", num);
@@ -674,17 +674,23 @@ typedef uint32_t in_addr_t;
       // int四个字节，char一个字节
       unsigned char *p = (unsigned char *)#
       printf("%d %d %d %d\n", *p, *(p + 1), *(p + 2), *(p + 3));
-
+  
       // 将网络字节序的IP整数转换成点分十进制的IP字符串
       char ip[16] = "";
       inet_ntop(AF_INET, &num, ip, sizeof(ip));
       printf("转换成的IP地址字符串：%s\n", ip);
-
+  
       return 0;
   }
   ```
 
   ![image-20211117221901175](04Linux网络编程/image-20211117221901175.png)
+
+### 转换端口与转换IP
+
+转换端口用函数 `htons、ntohs`
+
+转换IP用函数 `inet_pton、inet_ntop`
 
 ## TCP与UDP区别
 
@@ -968,6 +974,23 @@ int main()
 
 ![image-20211121144550714](04Linux网络编程/image-20211121144550714.png)
 
+**为什么要进行三次握手，两次握手不行吗？**
+
+> - 第一次握手
+>
+>   - 客户端能确定：客户端发送没问题
+>   - 服务端能确定：客户端发送没问题，服务端接收没问题
+> - 第二次握手
+>
+>   - 客户端能确定：客户端发送、接收没问题，服务端发送、接收没问题
+>   - 服务端能确定：客户端发送没问题，服务端发送、接收没问题
+> - 第三次握手
+>
+>   - 客户端能确定：客户端发送、接收没问题，服务端发送、接收没问题
+>   - 服务端能确定：客户端发送、接收没问题，服务端发送、接收没问题
+>
+> 至此，客户端和服务端都能确定双方的收发均没问题
+
 ### 握手流程
 
 ![image-20211121145128707](04Linux网络编程/image-20211121145128707.png)
@@ -999,7 +1022,7 @@ int main()
 
 ### 简介
 
-- `滑动窗口`是 TCP 中实现诸如 ACK 确认、流量控制、拥塞控制的承载结构
+- `滑动窗口` 是 TCP 中实现诸如 ACK 确认、流量控制、拥塞控制的承载结构
 - TCP 中采用滑动窗口来进行传输控制，滑动窗口的大小意味着**接收方还有多大的缓冲区可以用于接收数据**。**发送方可以通过滑动窗口的大小来确定应该发送多少字节的数据**。当滑动窗口为 0时，发送方一般不能再发送数据报
 
 > 滑动窗口（Sliding window）是一种流量控制技术。早期的网络通信中，通信双方不会考虑网络的拥挤情况直接发送数据。由于大家不知道网络拥塞状况，同时发送数据，导致中间节点阻塞掉包，谁也发不了数据，所以就有了滑动窗口机制来解决此问题
@@ -1030,8 +1053,8 @@ int main()
 
 ### 挥手流程
 
-- 四次挥手发生在断开连接的时候，在程序中当调用了 `close()`会使用TCP协议进行四次挥手
-- 客户端和服务器端都可以主动发起断开连接，谁先调用 `close()`谁就是发起方
+- 四次挥手发生在断开连接的时候，在程序中当调用了 `close()` 会使用TCP协议进行四次挥手
+- 客户端和服务器端都可以主动发起断开连接，谁先调用 `close()` 谁就是发起方
 - 因为在TCP连接的时候，采用三次握手建立的的连接是双向的，在断开的时候需要双向断开
 
 ![image-20211121154857445](04Linux网络编程/image-20211121154857445.png)
@@ -1042,9 +1065,10 @@ int main()
 
 ### 注解
 
-- 图中 `MSS`表示Maximum Segment Size(一条数据的最大的数据量)
-- `win`表示滑动窗口大小
-- 图中部分 `ACK`应为确认号 `ack`，而非标志位 `ACK`
+- 图中 `MSS` 表示Maximum Segment Size(一条数据的最大的数据量)
+- `win` 表示滑动窗口大小
+- 图中部分 `ACK` 应为确认号 `ack`，而非标志位 `ACK`
+- 图中 `SYN` 后跟的 `0(0)、8000(0)`，第一个 `0、8000` 表示随机生成的序号，第二个 `0、0` 表示发送了0个数据
 
 ### 流程说明
 
@@ -1088,7 +1112,7 @@ int main()
   - 简单修改：将客户端中休眠语句的位置进行更改
   - 方法：[[261]Connection reset by peer的常见原因及解决办法](https://blog.csdn.net/xc_zhou/article/details/80950753)
 - 解决上一个问题后，服务端出现两次 `client closed...`，如何解决？
-  - 是因为在关闭连接后，应该退出循环，所以在该 `printf`语句后，添加 `break`即可
+  - 是因为在关闭连接后，应该退出循环，所以在该 `printf`语句后，添加 `break` 即可
 
 #### 服务端
 
@@ -1345,7 +1369,7 @@ void* working(void *arg) {
 int main()
 {
     // 初始化线程结构体数据
-    int sockinfo_maxLen = sizeof(sockinfos) / sizeof(sockinfos[0]);
+    int sockinfo_maxLen = sizeof(sockinfos) / sizeof(sockinfos[0]);	// 计算结构体数据的长度
     for (int i = 0; i < sockinfo_maxLen; i++) {
         bzero(&sockinfos[i], sizeof(sockinfos[i]));
         sockinfos[i].fd = -1;
@@ -1494,7 +1518,7 @@ int main()
 
 ![image-20211123124611335](04Linux网络编程/image-20211123124611335.png)
 
-### MSL与半关闭
+### MSL(Maximum Segment Lefttime,最大报文段生存时间)与半关闭
 
 - 主动断开连接的一方，最后会进入一个 `TIME_WAIT`状态，这个状态会持续 `2msl`
 - `msl`：官方建议2分钟，实际是30s，**主要是为了防止挥手信息丢失**
@@ -1628,9 +1652,9 @@ int main()
   #include <sys/types.h> 
   #include <unistd.h> 
   #include <sys/select.h> 
-
+  
   int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout);
-
+  
   // 将参数文件描述符fd对应的标志位设置为0 
   void FD_CLR(int fd, fd_set *set); 
   // 判断fd对应的标志位是0还是1， 返回值 ： fd对应的标志位的值，0，返回0， 1，返回1 
@@ -1780,7 +1804,7 @@ int main()
                 inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, client_ip, sizeof(client_ip));
                 unsigned short client_port = ntohs(client_addr.sin_port);
                 printf("ip:%s, port:%d\n", client_ip, client_port);
-
+			   // 添加新的文件描述符到集合中
                 FD_SET(connfd, &rSet);
                 // 更新最大文件符
                 maxfd = maxfd > connfd ? maxfd : connfd;
@@ -1914,7 +1938,7 @@ int main()
       short events; /* 委托内核检测文件描述符的什么事件 */ 
       short revents; /* 文件描述符实际发生的事件 */ 
   };
-
+  
   int poll(struct pollfd *fds, nfds_t nfds, int timeout);
   ```
 - `int poll(struct pollfd *fds, nfds_t nfds, int timeout); `
@@ -2137,11 +2161,11 @@ int main()
 
   ```c
   #include <sys/epoll.h>
-
+  
   // 创建一个新的epoll实例
-  // 在内核中创建了一个数据，这个数据中有两个比较重要的数据，一个是需要检测的文件描述符的信息（红黑树），还有一个是就绪列表，存放检测到数据发送改变的文件描述符信息（双向链表）
+  // 在内核中创建了一个数据，这个数据中有两个比较重要的数据，一个是需要检测的文件描述符的信息（红黑树），还有一个是就绪列表，存放检测到数据发生改变的文件描述符信息（双向链表）
   int epoll_create(int size);
-
+  
   // 对epoll实例进行管理：添加文件描述符信息，删除信息，修改信息
   int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
   struct epoll_event { 
@@ -2154,7 +2178,7 @@ int main()
       uint32_t u32; 
       uint64_t u64; 
   } epoll_data_t;
-
+  
   // 检测函数
   int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
   ```
@@ -2404,7 +2428,7 @@ int main()
 
   - LT
     - 用户不读数据，数据一直在缓冲区，epoll 会一直通知
-    - 用户只读了一部分数据，epoll会通知
+    - 用户只读了一部分数据，epoll 会通知
     - 缓冲区的数据读完了，不通知
   - ET
     - 用户不读数据，数据一致在缓冲区中，epoll下次检测的时候就不通知了
