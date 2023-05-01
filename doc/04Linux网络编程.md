@@ -493,7 +493,7 @@ int main()
 ### 简介
 
 - socket地址其实是一个 `结构体`，**封装端口号和IP等信息**
-- 后面的socket相关的api中需要使用到这个 socket地址
+- 后面的socket相关的 `API` 中需要使用到这个 socket 地址
 
 ### **通用** **socket** 地址
 
@@ -636,7 +636,7 @@ typedef uint32_t in_addr_t;
       - `af`：地址族
         - IPV4：`AF_INET`
         - IPV6：`AF_INET6(IPV6)`
-      - `src`：要转换的ip的整数的地址
+      - `src`：要转换的 ip 的整数的地址
       - `dst`：转换成IP地址字符串保存的地方
       - `size`：第三个参数的大小（数组的大小）
     - 返回值：返回转换后的数据的地址（字符串），和 dst 是一样的
@@ -672,7 +672,7 @@ typedef uint32_t in_addr_t;
       printf("转换成的网络字节序：%d\n", num);
       // 将转换成的网络字节序，一个字节一个字节的读取出来，便形成了192 168 1 1
       // int四个字节，char一个字节
-      unsigned char *p = (unsigned char *)#
+      unsigned char *p = (unsigned char *)&num
       printf("%d %d %d %d\n", *p, *(p + 1), *(p + 2), *(p + 3));
   
       // 将网络字节序的IP整数转换成点分十进制的IP字符串
@@ -822,85 +822,86 @@ typedef uint32_t in_addr_t;
 ### 服务器端
 
 ```c
-#include <stdio.h>
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
+#include<arpa/inet.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
 
-#define SERVERIP "127.0.0.1"
-#define PORT 6789
-
-int main()
-{
-    // 1. 创建socket（用于监听的套接字）
-    int listenfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (listenfd == -1) {
+int main(){
+    // 创建一个监听的套接字
+    int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(listen_fd == -1){
         perror("socket");
         exit(-1);
     }
 
-    // 2. 绑定
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = PF_INET;
-    // 点分十进制转换为网络字节序
-    inet_pton(AF_INET, SERVERIP, &server_addr.sin_addr.s_addr);
-    // 服务端也可以绑定0.0.0.0即任意地址
-    // server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(PORT);
-    int ret = bind(listenfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    if (ret == -1) {
+    // 设置本地IP和端口
+    struct sockaddr_in saddr;
+    saddr.sin_family = AF_INET;
+    // inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr.s_addr);
+    saddr.sin_addr.s_addr = INADDR_ANY;
+    saddr.sin_port = htons(9999);
+
+    // 将监听文件描述符与本地IP和端口绑定
+    int ret = bind(listen_fd, (struct sockaddr *)&saddr, sizeof(saddr));
+    if(ret == -1){
         perror("bind");
         exit(-1);
     }
-
-    // 3. 监听
-    ret = listen(listenfd, 8);
-        if (ret == -1) {
+    // 监听
+    ret = listen(listen_fd, 8);
+    if(ret == -1){
         perror("listen");
         exit(-1);
     }
 
-    // 4. 接收客户端连接
-    struct sockaddr_in client_addr;
-    socklen_t client_addr_len = sizeof(client_addr);
-    int connfd = accept(listenfd, (struct sockaddr*)&client_addr, &client_addr_len);
-    if (connfd == -1) {
+    // 等待连接
+    struct sockaddr_in caddr;
+    socklen_t len = sizeof(caddr);
+    int cfd = accept(listen_fd, (struct sockaddr *)&caddr, &len);
+    if(cfd == -1){
         perror("accept");
         exit(-1);
     }
-    // 输出客户端信息，IP组成至少16个字符（包含结束符）
-    char client_ip[16] = {0};
-    inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, client_ip, sizeof(client_ip));
-    unsigned short client_port = ntohs(client_addr.sin_port);
-    printf("ip:%s, port:%d\n", client_ip, client_port);
 
+    // 连接成功，获取客户端信息
+    char cIP[16];
+    inet_ntop(AF_INET, &caddr.sin_addr.s_addr, cIP, sizeof(cIP));
+    unsigned short cport = ntohs(caddr.sin_port);
+    printf("client IP is : %s, port is %d\n", cIP, cport);
 
-    // 5. 开始通信
-    // 服务端先接收客户端信息，再向客户端发送数据
-    // 接收数据
-    char recv_buf[1024] = {0};
-    while (1) {
-        ret = read(connfd, recv_buf, sizeof(recv_buf));
-        if (ret == -1) {
+    char buf[1024] = {0};
+    char *data = "hello, i am server";
+    // 开始通信
+    while(1){
+        // 读取客户端数据
+        memset(buf, 0, 1024);
+        ret = read(cfd, buf, sizeof(buf));
+        if (ret == -1)
+        {
             perror("read");
             exit(-1);
-        } else if (ret > 0) {
-            printf("recv client data : %s\n", recv_buf);
-        } else {
-            // 表示客户端断开连接
+        }
+        else if (ret > 0)
+        {
+            printf("recv data is %s\n", buf);
+        }
+        else
+        {
+            // 服务器断开连接
             printf("client closed...\n");
             break;
         }
-        // 发送数据
-        char *send_buf = "hello, i am server";
-        // 粗心写成sizeof，那么就会导致遇到空格终止
-        write(connfd, send_buf, strlen(send_buf));
+
+        // 给客户端发送数据
+        write(cfd, data, strlen(data));
     }
 
     // 关闭文件描述符
-    close(connfd);
-    close(listenfd);
+    close(cfd);
+    close(listen_fd);
+
     return 0;
 }
 ```
@@ -908,56 +909,58 @@ int main()
 ### 客户端
 
 ```c
-#include <stdio.h>
 #include <arpa/inet.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
-#define SERVERIP "127.0.0.1"
-#define PORT 6789
-
-int main()
-{
-    // 1. 创建socket（用于通信的套接字）
-    int connfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (connfd == -1) {
+int main(){
+    // 创建套接字
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+    if(fd == -1){
         perror("socket");
         exit(-1);
     }
-    // 2. 连接服务器端
-    struct sockaddr_in server_addr;
-    server_addr.sin_family = PF_INET;
-    inet_pton(AF_INET, SERVERIP, &server_addr.sin_addr.s_addr);
-    server_addr.sin_port = htons(PORT);
-    int ret = connect(connfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
-    if (ret == -1) {
+
+    // 连接服务器
+    struct sockaddr_in saddr;
+    inet_pton(AF_INET, "127.0.0.1", &saddr.sin_addr.s_addr);
+    saddr.sin_family = AF_INET;
+    saddr.sin_port = htons(9999);
+    int ret = connect(fd, (struct sockaddr *)&saddr, sizeof(saddr));
+    if(ret == -1){
         perror("connect");
         exit(-1);
     }
-    // 3. 通信
-            char recv_buf[1024] = {0};
-    while (1) {
-        // 发送数据
-        char *send_buf = "client message";
+
+    char data[1024] = {0};
+    char send_buf[1024] = {0};
+    while(1){
+        // 写数据给服务器
+        memset(send_buf, 0, 1024);
+        fgets(send_buf, sizeof(send_buf), stdin);
         // 粗心写成sizeof，那么就会导致遇到空格终止
-        write(connfd, send_buf, strlen(send_buf));
-        sleep(1);
-        // 接收数据
-        ret = read(connfd, recv_buf, sizeof(recv_buf));
-        if (ret == -1) {
+        write(fd, send_buf, strlen(send_buf) + 1);  // +1 是因为需要写入结束符\0
+
+        // 读取数据
+        memset(data, 0, 1024);
+        ret = read(fd, data, sizeof(data));
+        if(ret == -1){
             perror("read");
             exit(-1);
-        } else if (ret > 0) {
-            printf("recv client data : %s\n", recv_buf);
-        } else {
-            // 表示服务端断开连接
+        }else if(ret > 0){
+            printf("recv data is %s\n", data);
+        }else{
+            // 服务器断开连接
             printf("server closed...\n");
             break;
         }
     }
-    // 关闭连接
-    close(connfd);
+
+    // 关闭文件描述符
+    close(fd);
+
     return 0;
 }
 ```
