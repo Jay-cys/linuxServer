@@ -28,7 +28,7 @@ void * writeNum(void * arg) {
         num++;
         printf("++write, tid : %ld, num : %d\n", pthread_self(), num);
         pthread_rwlock_unlock(&rwlock);
-        usleep(100);
+        usleep(10);
     }
 
     return NULL;
@@ -40,7 +40,7 @@ void * readNum(void * arg) {
         pthread_rwlock_rdlock(&rwlock);
         printf("===read, tid : %ld, num : %d\n", pthread_self(), num);
         pthread_rwlock_unlock(&rwlock);
-        usleep(100);
+        usleep(10);
     }
 
     return NULL;
@@ -62,11 +62,11 @@ int main() {
 
     // 设置线程分离
     for(int i = 0; i < 3; i++) {
-       pthread_detach(wtids[i]);
+        pthread_detach(wtids[i]);
     }
 
     for(int i = 0; i < 5; i++) {
-         pthread_detach(rtids[i]);
+        pthread_detach(rtids[i]);
     }
 
     pthread_exit(NULL);

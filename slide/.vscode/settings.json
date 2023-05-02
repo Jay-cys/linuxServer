@@ -1,0 +1,32 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "pthread.h": "c",
+        "array": "c",
+        "atomic": "c",
+        "*.tcc": "c",
+        "concepts": "c",
+        "cstddef": "c",
+        "cstdio": "c",
+        "cwchar": "c",
+        "deque": "c",
+        "list": "c",
+        "vector": "c",
+        "functional": "c",
+        "memory": "c",
+        "memory_resource": "c",
+        "string_view": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "random": "c",
+        "initializer_list": "c",
+        "istream": "c",
+        "new": "c",
+        "stdexcept": "c",
+        "string": "c",
+        "system_error": "c",
+        "ratio": "c",
+        "typeinfo": "c",
+        "utility": "c"
+    }
+}

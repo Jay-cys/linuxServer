@@ -43,13 +43,13 @@ int main() {
     if(ret != 0) {
         char * errstr = strerror(ret);
         printf("error : %s\n", errstr);
-    } 
+    }
 
     for(int i = 0; i < 5; i++) {
         printf("%d\n", i);
     }
 
-    sleep(1);
+    // sleep(1);
 
     return 0;   // exit(0);
 }

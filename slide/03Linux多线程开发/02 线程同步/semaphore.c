@@ -88,7 +88,7 @@ void * customer(void * arg) {
         free(tmp);
         pthread_mutex_unlock(&mutex);
         sem_post(&psem);
-       
+        usleep(100);
     }
     return  NULL;
 }

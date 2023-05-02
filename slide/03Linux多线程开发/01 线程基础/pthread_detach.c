@@ -16,6 +16,7 @@
 
 void * callback(void * arg) {
     printf("chid thread id : %ld\n", pthread_self());
+    sleep(20);
     return NULL;
 }
 
@@ -47,6 +48,7 @@ int main() {
     //     printf("error3 : %s\n", errstr);
     // }
 
+    sleep(30);
     pthread_exit(NULL);
 
     return 0;

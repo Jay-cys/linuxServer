@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
 
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
-    saddr.sin_addr.s_addr = INADDR_ANY;
+    saddr.sin_addr.s_addr = INADDR_ANY; // INADDR_ANY 就是 0.0.0.0
     saddr.sin_port = htons(9999);
     
     //int optval = 1;

@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-// 创建一个互斥量
+// 创建互斥量
 pthread_mutex_t mutex;
 // 创建条件变量
 pthread_cond_t cond;
@@ -29,6 +29,7 @@ struct Node{
 // 头结点
 struct Node * head = NULL;
 
+// 生产者
 void * producer(void * arg) {
 
     // 不断的创建新的节点，添加到链表中
@@ -50,6 +51,7 @@ void * producer(void * arg) {
     return NULL;
 }
 
+// 消费者
 void * customer(void * arg) {
 
     while(1) {
@@ -62,14 +64,13 @@ void * customer(void * arg) {
             head = head->next;
             printf("del node, num : %d, tid : %ld\n", tmp->num, pthread_self());
             free(tmp);
-            pthread_mutex_unlock(&mutex);
             usleep(100);
         } else {
             // 没有数据，需要等待
-            // 当这个函数调用阻塞的时候，会对互斥锁进行解锁，当不阻塞的，继续向下执行，会重新加锁。
+            // 当这个函数调用阻塞的时候，会对互斥锁进行解锁，以便生产者进行生产，当不阻塞时，继续向下执行，会重新加锁。
             pthread_cond_wait(&cond, &mutex);
-            pthread_mutex_unlock(&mutex);
         }
+        pthread_mutex_unlock(&mutex);
     }
     return  NULL;
 }

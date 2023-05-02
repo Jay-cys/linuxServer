@@ -1,10 +1,24 @@
 /*
+    #include <pthread.h>
+    int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
+    void *(*start_routine) (void *), void *arg);
 
+        - 功能：创建一个子线程
+        - 参数：
+            - thread：传出参数，线程创建成功后，子线程的线程ID被写到该变量中。
+            - attr : 设置线程的属性，一般使用默认值，NULL
+            - start_routine : 函数指针，这个函数是子线程需要处理的逻辑代码
+            - arg : 给第三个参数使用，传参
+        - 返回值：
+            成功：0
+            失败：返回错误号。这个错误号和之前errno不太一样。
+            获取错误号的信息：  char * strerror(int errnum);
+            
     #include <pthread.h>
     void pthread_exit(void *retval);
         功能：终止一个线程，在哪个线程中调用，就表示终止哪个线程
         参数：
-            retval:需要传递一个指针，作为一个返回值，可以在pthread_join()中获取到。
+            retval:需要传递一个指针，作为一个返回值，可以在pthread_join()中获取到，可以使用NULL。
 
     pthread_t pthread_self(void);
         功能：获取当前的线程的线程ID
@@ -41,10 +55,10 @@ int main() {
 
     printf("tid : %ld, main thread id : %ld\n", tid ,pthread_self());
 
-    // 让主线程退出,当主线程退出时，不会影响其他正常运行的线程。
+    // 让主线程退出，当主线程退出时，不会影响其他正常运行的线程。
     pthread_exit(NULL);
 
-    printf("main thread exit\n");
+    printf("main thread exit\n");   // 不会执行，主线程已退出
 
     return 0;   // exit(0);
 }

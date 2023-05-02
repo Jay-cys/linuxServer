@@ -25,6 +25,7 @@ void * callback(void * arg) {
     // sleep(3);
     // return NULL; 
     // int value = 10; // 局部变量
+    sleep(5);
     pthread_exit((void *)&value);   // return (void *)&value;
 } 
 
@@ -44,9 +45,9 @@ int main() {
         printf("%d\n", i);
     }
 
-    printf("tid : %ld, main thread id : %ld\n", tid ,pthread_self());
+    printf("tid : %ld, main thread id : %ld\n", tid, pthread_self());
 
-    // 主线程调用pthread_join()回收子线程的资源
+    // 主线程调用pthread_join()回收子线程的资源，阻塞函数，不会出现主线程先结束的情况
     int * thread_retval;
     ret = pthread_join(tid, (void **)&thread_retval);
 

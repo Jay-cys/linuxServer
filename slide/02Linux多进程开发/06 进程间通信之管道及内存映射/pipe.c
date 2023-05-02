@@ -47,9 +47,9 @@ int main() {
             printf("parent recv : %s, pid : %d\n", buf, getpid());
             
             // 向管道中写入数据
-            //char * str = "hello,i am parent";
-            //write(pipefd[1], str, strlen(str));
-            //sleep(1);
+            // char * str = "hello,i am parent";
+            // write(pipefd[1], str, strlen(str));
+            // sleep(1);
         }
 
     } else if(pid == 0){
@@ -62,7 +62,7 @@ int main() {
             // 向管道中写入数据
             char * str = "hello,i am child";
             write(pipefd[1], str, strlen(str));
-            //sleep(1);
+            // sleep(1);
 
             // int len = read(pipefd[0], buf, sizeof(buf));
             // printf("child recv : %s, pid : %d\n", buf, getpid());

@@ -43,7 +43,7 @@ int main() {
     unsigned char *p1 = (unsigned char *)&sum1;
     printf("%d %d %d %d\n", *p1, *(p1+1), *(p1+2), *(p1+3));
     
-     // ntohs
+    // ntohs
 
 
     return 0;

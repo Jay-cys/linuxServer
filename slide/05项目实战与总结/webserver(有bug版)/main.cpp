@@ -19,6 +19,7 @@
 extern void addfd( int epollfd, int fd, bool one_shot );
 extern void removefd( int epollfd, int fd );
 
+// 添加信号捕捉
 void addsig(int sig, void( handler )(int)){
     struct sigaction sa;
     memset( &sa, '\0', sizeof( sa ) );
@@ -28,15 +29,18 @@ void addsig(int sig, void( handler )(int)){
 }
 
 int main( int argc, char* argv[] ) {
-    
+    // 用于命令行输入参数提示
     if( argc <= 1 ) {
         printf( "usage: %s port_number\n", basename(argv[0]));
         return 1;
     }
 
+    // 获取端口号
     int port = atoi( argv[1] );
+    // 对SIGPIPE进行处理
     addsig( SIGPIPE, SIG_IGN );
 
+    // 创建线程池，初始化线程池
     threadpool< http_conn >* pool = NULL;
     try {
         pool = new threadpool<http_conn>;
@@ -44,9 +48,10 @@ int main( int argc, char* argv[] ) {
         return 1;
     }
 
+    // 创建一个数组用于保存所有用户的客户端信息
     http_conn* users = new http_conn[ MAX_FD ];
-
-    int listenfd = socket( PF_INET, SOCK_STREAM, 0 );
+    // 创建监听的套接字
+    int listenfd = socket(PF_INET, SOCK_STREAM, 0);
 
     int ret = 0;
     struct sockaddr_in address;
@@ -54,16 +59,17 @@ int main( int argc, char* argv[] ) {
     address.sin_family = AF_INET;
     address.sin_port = htons( port );
 
-    // 端口复用
+    // 端口复用（端口复用一定要在绑定前设置）
     int reuse = 1;
     setsockopt( listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof( reuse ) );
     ret = bind( listenfd, ( struct sockaddr* )&address, sizeof( address ) );
+    // 监听
     ret = listen( listenfd, 5 );
 
     // 创建epoll对象，和事件数组，添加
     epoll_event events[ MAX_EVENT_NUMBER ];
     int epollfd = epoll_create( 5 );
-    // 添加到epoll对象中
+    // 将监听的文件描述符添加到epoll对象中
     addfd( epollfd, listenfd, false );
     http_conn::m_epollfd = epollfd;
 
@@ -92,25 +98,29 @@ int main( int argc, char* argv[] ) {
                 } 
 
                 if( http_conn::m_user_count >= MAX_FD ) {
+                    // 目前连接数满了
+                    // 给哭护短写一个信息：服务器正忙（一般都这么做）
                     close(connfd);
                     continue;
                 }
+                // 将新的客户的数据初始化，放到数组中
                 users[connfd].init( connfd, client_address);
 
             } else if( events[i].events & ( EPOLLRDHUP | EPOLLHUP | EPOLLERR ) ) {
-
+                // 对方异常断开或者错误等事件
                 users[sockfd].close_conn();
 
             } else if(events[i].events & EPOLLIN) {
-
+                // 检测到读事件，一次性把所有数据都读完
                 if(users[sockfd].read()) {
+                    // 将任务添加到线程池,参数为指针,传递数组+偏移量
                     pool->append(users + sockfd);
                 } else {
                     users[sockfd].close_conn();
                 }
 
             }  else if( events[i].events & EPOLLOUT ) {
-
+                // 检测到写入事件，一次性写完所有数据
                 if( !users[sockfd].write() ) {
                     users[sockfd].close_conn();
                 }

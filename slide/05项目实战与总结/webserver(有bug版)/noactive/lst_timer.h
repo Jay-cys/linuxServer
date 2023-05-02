@@ -46,9 +46,11 @@ public:
     
     // 将目标定时器timer添加到链表中
     void add_timer( util_timer* timer ) {
+        // timer为空,直接返回
         if( !timer ) {
             return;
         }
+        // 没有头结点
         if( !head ) {
             head = tail = timer;
             return; 

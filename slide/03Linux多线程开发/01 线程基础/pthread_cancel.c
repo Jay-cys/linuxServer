@@ -14,8 +14,9 @@
 
 void * callback(void * arg) {
     printf("chid thread id : %ld\n", pthread_self());
-    for(int i = 0; i < 5; i++) {
+    for(int i = 0; i < 100; i++) {
         printf("child : %d\n", i);
+        // sleep(1);
     }
     return NULL;
 }

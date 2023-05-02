@@ -26,10 +26,10 @@ void myFun(int num) {
        if(ret > 0) {
            printf("child die , pid = %d\n", ret);
        } else if(ret == 0) {
-           // 说明还有子进程或者
+           // 说明还有子进程活着
            break;
        } else if(ret == -1) {
-           // 没有子进程
+           // 没有子进程，发生错误
            break;
        }
     }
@@ -38,10 +38,10 @@ void myFun(int num) {
 int main() {
 
     // 提前设置好阻塞信号集，阻塞SIGCHLD，因为有可能子进程很快结束，父进程还没有注册完信号捕捉
-    sigset_t set;
-    sigemptyset(&set);
-    sigaddset(&set, SIGCHLD);
-    sigprocmask(SIG_BLOCK, &set, NULL);
+    // sigset_t set;
+    // sigemptyset(&set);
+    // sigaddset(&set, SIGCHLD);
+    // sigprocmask(SIG_BLOCK, &set, NULL);
 
     // 创建一些子进程
     pid_t pid;
@@ -63,7 +63,7 @@ int main() {
         sigaction(SIGCHLD, &act, NULL);
 
         // 注册完信号捕捉以后，解除阻塞
-        sigprocmask(SIG_UNBLOCK, &set, NULL);
+        // sigprocmask(SIG_UNBLOCK, &set, NULL);
 
         while(1) {
             printf("parent process pid : %d\n", getpid());

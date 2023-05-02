@@ -34,7 +34,7 @@ int main() {
 
 
     // 创建一个子进程，在子进程中执行exec函数族中的函数
-    pid_t pid = fork();
+    __pid_t pid = fork();
 
     if(pid > 0) {
         // 父进程

@@ -12,7 +12,7 @@ const char* error_500_title = "Internal Error";
 const char* error_500_form = "There was an unusual problem serving the requested file.\n";
 
 // 网站的根目录
-const char* doc_root = "/home/nowcoder/webserver/resources";
+const char *doc_root = "/home/jay_cy/slide/05项目实战与总结/webserver(有bug版)/resources";
 
 int setnonblocking( int fd ) {
     int old_option = fcntl( fd, F_GETFL );
@@ -73,7 +73,7 @@ void http_conn::init(int sockfd, const sockaddr_in& addr){
     int reuse = 1;
     setsockopt( m_sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof( reuse ) );
     addfd( m_epollfd, sockfd, true );
-    m_user_count++;
+    m_user_count++; // 总用户数+1
     init();
 }
 
@@ -101,11 +101,11 @@ bool http_conn::read() {
     if( m_read_idx >= READ_BUFFER_SIZE ) {
         return false;
     }
+    // 读取到的字节
     int bytes_read = 0;
     while(true) {
         // 从m_read_buf + m_read_idx索引出开始保存数据，大小是READ_BUFFER_SIZE - m_read_idx
-        bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, 
-        READ_BUFFER_SIZE - m_read_idx, 0 );
+        bytes_read = recv(m_sockfd, m_read_buf + m_read_idx, READ_BUFFER_SIZE - m_read_idx, 0 );
         if (bytes_read == -1) {
             if( errno == EAGAIN || errno == EWOULDBLOCK ) {
                 // 没有数据
@@ -115,6 +115,7 @@ bool http_conn::read() {
         } else if (bytes_read == 0) {   // 对方关闭连接
             return false;
         }
+        // 成功读取到数据，更新索引
         m_read_idx += bytes_read;
     }
     return true;
@@ -148,7 +149,7 @@ http_conn::LINE_STATUS http_conn::parse_line() {
 
 // 解析HTTP请求行，获得请求方法，目标URL,以及HTTP版本号
 http_conn::HTTP_CODE http_conn::parse_request_line(char* text) {
-    // GET /index.html HTTP/1.1
+    // GET /index.html HTTP/1.1   可以使用正则表达式
     m_url = strpbrk(text, " \t"); // 判断第二个参数中的字符哪个在text中最先出现
     if (! m_url) { 
         return BAD_REQUEST;
@@ -167,6 +168,7 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char* text) {
     if (!m_version) {
         return BAD_REQUEST;
     }
+    // /index.html\0HTTP/1.1
     *m_version++ = '\0';
     if (strcasecmp( m_version, "HTTP/1.1") != 0 ) {
         return BAD_REQUEST;
@@ -174,10 +176,10 @@ http_conn::HTTP_CODE http_conn::parse_request_line(char* text) {
     /**
      * http://192.168.110.129:10000/index.html
     */
-    if (strncasecmp(m_url, "http://", 7) == 0 ) {   
-        m_url += 7;
+    if (strncasecmp(m_url, "http://", 7) == 0 ) {
+        m_url += 7; // 192.168.110.129:10000/index.html
         // 在参数 str 所指向的字符串中搜索第一次出现字符 c（一个无符号字符）的位置。
-        m_url = strchr( m_url, '/' );
+        m_url = strchr( m_url, '/' );   // /index.html
     }
     if ( !m_url || m_url[0] != '/' ) {
         return BAD_REQUEST;
@@ -199,8 +201,10 @@ http_conn::HTTP_CODE http_conn::parse_headers(char* text) {
         // 否则说明我们已经得到了一个完整的HTTP请求
         return GET_REQUEST;
     } else if ( strncasecmp( text, "Connection:", 11 ) == 0 ) {
+        // strncasecmp 比较两个参数不超过11个字符，忽略大小写
         // 处理Connection 头部字段  Connection: keep-alive
         text += 11;
+        // strspn 返回s1中第一个不在s2中出现的字符下标
         text += strspn( text, " \t" );
         if ( strcasecmp( text, "keep-alive" ) == 0 ) {
             m_linger = true;
@@ -233,9 +237,11 @@ http_conn::HTTP_CODE http_conn::parse_content( char* text ) {
 
 // 主状态机，解析请求
 http_conn::HTTP_CODE http_conn::process_read() {
+    // 定义初始状态
     LINE_STATUS line_status = LINE_OK;
     HTTP_CODE ret = NO_REQUEST;
     char* text = 0;
+    // 解析到了一行完整的数据，或者解析到了请求体，也是完整的数据
     while (((m_check_state == CHECK_STATE_CONTENT) && (line_status == LINE_OK))
                 || ((line_status = parse_line()) == LINE_OK)) {
         // 获取一行数据
@@ -244,6 +250,7 @@ http_conn::HTTP_CODE http_conn::process_read() {
         printf( "got 1 http line: %s\n", text );
 
         switch ( m_check_state ) {
+            // 请求行
             case CHECK_STATE_REQUESTLINE: {
                 ret = parse_request_line( text );
                 if ( ret == BAD_REQUEST ) {
@@ -251,6 +258,7 @@ http_conn::HTTP_CODE http_conn::process_read() {
                 }
                 break;
             }
+            // 请求头
             case CHECK_STATE_HEADER: {
                 ret = parse_headers( text );
                 if ( ret == BAD_REQUEST ) {
@@ -260,6 +268,7 @@ http_conn::HTTP_CODE http_conn::process_read() {
                 }
                 break;
             }
+            // 请求体
             case CHECK_STATE_CONTENT: {
                 ret = parse_content( text );
                 if ( ret == GET_REQUEST ) {
@@ -386,6 +395,7 @@ bool http_conn::add_headers(int content_len) {
     add_content_type();
     add_linger();
     add_blank_line();
+    return true;
 }
 
 bool http_conn::add_content_length(int content_len) {
@@ -415,6 +425,7 @@ bool http_conn::add_content_type() {
 bool http_conn::process_write(HTTP_CODE ret) {
     switch (ret)
     {
+        // 内部错误
         case INTERNAL_ERROR:
             add_status_line( 500, error_500_title );
             add_headers( strlen( error_500_form ) );
@@ -422,6 +433,7 @@ bool http_conn::process_write(HTTP_CODE ret) {
                 return false;
             }
             break;
+        // 语法错误
         case BAD_REQUEST:
             add_status_line( 400, error_400_title );
             add_headers( strlen( error_400_form ) );
@@ -429,6 +441,7 @@ bool http_conn::process_write(HTTP_CODE ret) {
                 return false;
             }
             break;
+        // 没有资源
         case NO_RESOURCE:
             add_status_line( 404, error_404_title );
             add_headers( strlen( error_404_form ) );
@@ -436,6 +449,7 @@ bool http_conn::process_write(HTTP_CODE ret) {
                 return false;
             }
             break;
+        // 禁止访问
         case FORBIDDEN_REQUEST:
             add_status_line( 403, error_403_title );
             add_headers(strlen( error_403_form));
@@ -443,6 +457,7 @@ bool http_conn::process_write(HTTP_CODE ret) {
                 return false;
             }
             break;
+        // 请求为文件
         case FILE_REQUEST:
             add_status_line(200, ok_200_title );
             add_headers(m_file_stat.st_size);
