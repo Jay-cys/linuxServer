@@ -763,7 +763,7 @@ typedef uint32_t in_addr_t;
   - 参数：
     - `domain`：协议族(常用如下)
       - `AF_INET` ：`ipv4`
-      - `AF_INET`6 ：`ipv6`
+      - `AF_INET6`  ：`ipv6`
       - `AF_UNIX`, `AF_LOCAL`：本地套接字通信（进程间通信）
     - `type`：通信过程中使用的协议类型
       - `SOCK_STREAM` : 流式协议，TCP：字节流

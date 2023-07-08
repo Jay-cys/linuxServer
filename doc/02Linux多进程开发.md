@@ -184,7 +184,7 @@
   /*
       #include <sys/types.h>
       #include <unistd.h>
-
+  
       pid_t fork(void);
           函数的作用：用于创建子进程。
           返回值：
@@ -194,42 +194,42 @@
               如何区分父进程和子进程：通过fork的返回值。
               在父进程中返回-1，表示创建子进程失败，并且设置errno
   */
-
+  
   #include <sys/types.h>
   #include <unistd.h>
   #include <stdio.h>
-
+  
   int main() 
   {
       int num = 10;
-
+  
       // 创建子进程
       pid_t pid = fork();
-
+  
       // 判断是父进程还是子进程
       if(pid > 0) {
           printf("pid : %d\n", pid);
           // 如果大于0，返回的是创建的子进程的进程号，当前是父进程
           printf("i am parent process, pid : %d, ppid : %d\n", getpid(), getppid());
-
+  
           printf("parent num : %d\n", num);
           num += 10;
           printf("parent num += 10 : %d\n", num);
       } else if(pid == 0) {
           // 当前是子进程
           printf("i am child process, pid : %d, ppid : %d\n", getpid(),getppid());
-
+  
           printf("child num : %d\n", num);
           num += 100;
           printf("child num += 100 : %d\n", num);
       }
-
+  
       // for循环
       for(int i = 0; i < 3; i++) {
           printf("i : %d , pid : %d\n", i , getpid());
           sleep(1);
       }
-
+  
       return 0;
   }
   ```
@@ -345,13 +345,13 @@
     ```c
     #include <unistd.h>
     #include <stdio.h>
-
+    
     int main() {
 
 
         // 创建一个子进程，在子进程中执行exec函数族中的函数
         pid_t pid = fork();
-
+    
         if(pid > 0) {
             // 父进程
             printf("i am parent process, pid : %d\n",getpid());
@@ -361,14 +361,14 @@
             // 子进程
             // 调用自己写的可执行程序
             execl("/home/u/Desktop/Linux/hello","hello",NULL);
-
+    
             // 调用系统进程
             // execl("/bin/ps", "ps", "aux", NULL);
             perror("execl");
             printf("i am child process, pid : %d\n", getpid());
-
+    
         }
-
+    
         for(int i = 0; i < 3; i++) {
             printf("i = %d, pid = %d\n", i, getpid());
         }
@@ -390,13 +390,13 @@
     ```c
     #include <unistd.h>
     #include <stdio.h>
-
+    
     int main() {
 
 
         // 创建一个子进程，在子进程中执行exec函数族中的函数
         pid_t pid = fork();
-
+    
         if(pid > 0) {
             // 父进程
             printf("i am parent process, pid : %d\n",getpid());
@@ -404,11 +404,11 @@
         }else if(pid == 0) {
             // 子进程
             execlp("ps", "ps", "aux", NULL);
-
+    
             printf("i am child process, pid : %d\n", getpid());
-
+    
         }
-
+    
         for(int i = 0; i < 3; i++) {
             printf("i = %d, pid = %d\n", i, getpid());
         }
@@ -428,13 +428,13 @@
     ```c
     #include <unistd.h>
     #include <stdio.h>
-
+    
     int main() {
 
 
         // 创建一个子进程，在子进程中执行exec函数族中的函数
         pid_t pid = fork();
-
+    
         if(pid > 0) {
             // 父进程
             printf("i am parent process, pid : %d\n",getpid());
@@ -446,9 +446,9 @@
             execle("/home/u/Desktop/Linux/hello", "hello", NULL, envp);
             perror("execle");
             printf("i am child process, pid : %d\n", getpid());
-
+    
         }
-
+    
         for(int i = 0; i < 3; i++) {
             printf("i = %d, pid = %d\n", i, getpid());
         }
@@ -468,13 +468,13 @@
     ```c
     #include <unistd.h>
     #include <stdio.h>
-
+    
     int main() {
 
 
         // 创建一个子进程，在子进程中执行exec函数族中的函数
         pid_t pid = fork();
-
+    
         if(pid > 0) {
             // 父进程
             printf("i am parent process, pid : %d\n",getpid());
@@ -485,9 +485,9 @@
             execv("/home/u/Desktop/Linux/hello", argv);
             perror("execv");
             printf("i am child process, pid : %d\n", getpid());
-
+    
         }
-
+    
         for(int i = 0; i < 3; i++) {
             printf("i = %d, pid = %d\n", i, getpid());
         }
@@ -577,30 +577,30 @@ int main()
     #include <sys/types.h>
     #include <unistd.h>
     #include <stdio.h>
-
+    
     int main() {
-
+    
         // 创建子进程
         pid_t pid = fork();
-
+    
         // 判断是父进程还是子进程
         if(pid > 0) {
             while(1) {
                 printf("i am parent process, pid : %d, ppid : %d\n", getpid(), getppid());
                 sleep(1);
             }
-
+    
         } else if(pid == 0) {
             // 当前是子进程
             printf("i am child process, pid : %d, ppid : %d\n", getpid(),getppid());
-
+    
         }
-
+    
         // for循环
         for(int i = 0; i < 3; i++) {
             printf("i : %d , pid : %d\n", i , getpid());
         }
-
+    
         return 0;
     }
     ```
@@ -911,21 +911,21 @@ int main() {
           返回值：
               成功 0
               失败 -1
-
+  
       管道默认是阻塞的：如果管道中没有数据，read阻塞，如果管道满了，write阻塞
-
+  
       注意：匿名管道只能用于具有关系的进程之间的通信（父子进程，兄弟进程）
   */
-
+  
   // 子进程发送数据给父进程，父进程读取到数据输出
   #include <unistd.h>
   #include <sys/types.h>
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
-
+  
   int main() {
-
+  
       // 在fork之前创建管道
       int pipefd[2];
       int ret = pipe(pipefd);
@@ -933,28 +933,28 @@ int main() {
           perror("pipe");
           exit(0);
       }
-
+  
       // 创建子进程
       pid_t pid = fork();
       if(pid > 0) {
           // 父进程
           printf("i am parent process, pid : %d\n", getpid());
-
+  
           // 关闭写端
           // close(pipefd[1]);
-
+  
           // 从管道的读取端读取数据
           char buf[1024] = {0};
           while(1) {
               int len = read(pipefd[0], buf, sizeof(buf));
               printf("parent recv : %s, pid : %d\n", buf, getpid());
-
+  
               // 向管道中写入数据
               //char * str = "hello,i am parent";
               //write(pipefd[1], str, strlen(str));
               //sleep(1);
           }
-
+  
       } else if(pid == 0){
           // 子进程
           printf("i am child process, pid : %d\n", getpid());
@@ -966,12 +966,12 @@ int main() {
               char * str = "hello,i am child";
               write(pipefd[1], str, strlen(str));
               sleep(1);
-
+  
               // int len = read(pipefd[0], buf, sizeof(buf));
               // printf("child recv : %s, pid : %d\n", buf, getpid());
               // bzero(buf, 1024);
           }
-
+  
       }
       return 0;
   }
@@ -991,56 +991,56 @@ int main() {
   ```c
   /*
       实现 ps aux | grep xxx 父子进程间通信
-
+  
       子进程： ps aux, 子进程结束后，将数据发送给父进程
       父进程：获取到数据，过滤
       pipe()
       execlp()
       子进程将标准输出 stdout_fileno 重定向到管道的写端。  dup2
   */
-
+  
   #include <unistd.h>
   #include <sys/types.h>
   #include <stdio.h>
   #include <stdlib.h>
   #include <string.h>
   #include <wait.h>
-
+  
   int main() {
-
+  
       // 创建一个管道
       int fd[2];
       int ret = pipe(fd);
-
+  
       if(ret == -1) {
           perror("pipe");
           exit(0);
       }
-
+  
       // 创建子进程
       pid_t pid = fork();
-
+  
       if(pid > 0) {
           // 父进程
           // 关闭写端，必须要有，否则程序不会结束
           close(fd[1]);
           // 从管道中读取
           char buf[1024] = {0};
-
+  
           int len = -1;
           while((len = read(fd[0], buf, sizeof(buf) - 1)) > 0) {
               // 过滤数据输出
               printf("%s", buf);
               memset(buf, 0, 1024);
           }
-
+  
           wait(NULL);
-
+  
       } else if(pid == 0) {
           // 子进程
           // 关闭读端
           close(fd[0]);
-
+  
           // 文件描述符的重定向 stdout_fileno -> fd[1]
           dup2(fd[1], STDOUT_FILENO);
           // 执行 ps aux
@@ -1064,7 +1064,7 @@ int main() {
 int flags = fcntl(fd[0], F_GETFL);  // 获取原来的flag
 flags |= O_NONBLOCK;            // 修改flag的值
 fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
-```
+  ```
 
 #### 读写特点总结
 
@@ -1106,7 +1106,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <stdio.h>
   #include <unistd.h>
   #include <stdlib.h>
-
+  
   int main()
   {
       // 判断文件是否存在
@@ -1120,7 +1120,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
               exit(0);
           }
       }
-
+  
       return 0;
   }
   ```
@@ -1139,7 +1139,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <unistd.h>
   #include <fcntl.h>
   #include <string.h>
-
+  
   // 向管道中写数据
   int main() 
   {
@@ -1147,24 +1147,24 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
       int ret = access("test", F_OK);
       if(ret == -1) {
           printf("管道不存在，创建管道\n");
-
+  
           // 2.创建管道文件
           ret = mkfifo("test", 0664);
-
+  
           if(ret == -1) {
               perror("mkfifo");
               exit(0);
           }   
-
+  
       }
-
+  
       // 3.以只写的方式打开管道
       int fd = open("test", O_WRONLY);
       if(fd == -1) {
           perror("open");
           exit(0);
       }
-
+  
       // 写数据
       for(int i = 0; i < 100; i++) {
           char buf[1024];
@@ -1173,9 +1173,9 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           write(fd, buf, strlen(buf));
           sleep(1);
       }
-
+  
       close(fd);
-
+  
       return 0;
   }
   ```
@@ -1188,7 +1188,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <stdlib.h>
   #include <unistd.h>
   #include <fcntl.h>
-
+  
   // 从管道中读取数据
   int main() 
   {
@@ -1198,7 +1198,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("open");
           exit(0);
       }
-
+  
       // 读数据
       while(1) {
           char buf[1024] = {0};
@@ -1210,9 +1210,9 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           }
           printf("recv buf : %s\n", buf);
       }
-
+  
       close(fd);
-
+  
       return 0;
   }
   ```
@@ -1268,7 +1268,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <unistd.h>
   #include <fcntl.h>
   #include <string.h>
-
+  
   int main()
   {
       // 判断写管道是否存在，不存在则创建
@@ -1281,7 +1281,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
               exit(-1);
           }
       } 
-
+  
       // 判断读管道是否存在，不存在则创建
       ret = access("fifo2", F_OK);
       if (ret == -1) {
@@ -1330,7 +1330,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("fork");
           exit(-2);
       }
-
+  
       return 0;
   }
   ```
@@ -1354,7 +1354,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <unistd.h>
   #include <fcntl.h>
   #include <string.h>
-
+  
   int main()
   {
       // 判断写管道是否存在，不存在则创建
@@ -1367,7 +1367,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
               exit(-1);
           }
       } 
-
+  
       // 判断读管道是否存在，不存在则创建
       ret = access("fifo2", F_OK);
       if (ret == -1) {
@@ -1416,7 +1416,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("fork");
           exit(-2);
       }
-
+  
       return 0;
   }
   ```
@@ -1539,7 +1539,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <wait.h>
   #include <string.h>
   #include <stdlib.h>
-
+  
   int main()
   {
       // 打开指定文件
@@ -1564,7 +1564,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           // 类型需要强转
           strcpy(buf, (char *)ptr);
           printf("recv : %s\n", buf);
-
+  
       } else if (pid == 0) {
           // 子进程，用于发送数据
           // 类型需要强转
@@ -1573,7 +1573,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("fork");
           exit(-1);
       }
-
+  
       // 关闭内存映射区
       munmap(ptr, size);
       // 关闭文件
@@ -1609,7 +1609,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <sys/mman.h>
   #include <string.h>
   #include <stdlib.h>
-
+  
   int main()
   {
       // 打开源文件，获取文件长度并创建对应内存映射区
@@ -1620,7 +1620,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("mmap");
           exit(-1);
       }
-
+  
       // 打开目标文件，并创建对应内存映射区
       int fdTarget = open("target.txt", O_RDWR | O_CREAT, 0664);
       // 由于目标文件是通过创建得到，所以需要扩展长度与源文件保持一致
@@ -1632,16 +1632,16 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("mmap");
           exit(-1);
       }
-
+  
       // 内存拷贝
       memcpy(ptrTarget, ptrSource, len);
-
+  
       // 回收资源
       close(fdTarget);
       close(fdSource);
       munmap(ptrTarget, len);
       munmap(ptrSource, len);
-
+  
       return 0;
   }
   ```
@@ -1671,7 +1671,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   #include <stdlib.h>
   #include <string.h>
   #include <sys/wait.h>
-
+  
   int main()
   {
       void *ptr = mmap(NULL, 128, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -1693,7 +1693,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
           perror("fork");
           exit(-1);
       }
-
+  
       // 释放资源
       munmap(ptr, 128);
       return 0;
@@ -1763,7 +1763,7 @@ fcntl(fd[0], F_SETFL, flags);   // 设置新的flag
   ```c
   #include <stdio.h>
   #include <string.h>
-
+  
   int main()
   {
       char* buf;
@@ -1902,12 +1902,12 @@ int main() {
       struct timeval it_interval;  // 每个阶段的时间，间隔时间
       struct timeval it_value;     // 延迟多长时间执行定时器
   };
-
+  
   struct timeval {        // 时间的结构体
       time_t      tv_sec;     //  秒数   
       suseconds_t tv_usec;    //  微秒  
   };
-
+  
   // 过it_value秒后，每隔it_interval秒定时一次
   ```
 - 实现**过3秒以后，每隔2秒钟定时一次**=>因为没有**信号捕捉**，所以还没有实现这样的效果
@@ -1916,36 +1916,35 @@ int main() {
   #include <sys/time.h>
   #include <stdio.h>
   #include <stdlib.h>
-
+  
   // 过3秒以后，每隔2秒钟定时一次
   int main() 
   {
       struct itimerval new_value;
-
+  
       // 设置间隔的时间
       new_value.it_interval.tv_sec = 2;
       new_value.it_interval.tv_usec = 0;
-
+  
       // 设置延迟的时间,3秒之后开始第一次定时
       new_value.it_value.tv_sec = 3;
       new_value.it_value.tv_usec = 0;
 
 
-      int ret = setitimer(ITIMER_REAL, &new_value, NULL); // 非阻塞的
-      printf("定时器开始了...\n");
+```cpp
+  int ret = setitimer(ITIMER_REAL, &new_value, NULL); // 非阻塞的
+  printf("定时器开始了...\n");
 
-      if(ret == -1) {
-          perror("setitimer");
-          exit(0);
-      }
-
-      getchar();
-
-      return 0;
+  if(ret == -1) {
+      perror("setitimer");
+      exit(0);
   }
-  ```
 
-  ![image-20211006091442998](02Linux多进程开发/image-20211006091442998.png)
+  getchar();
+
+  return 0;
+```
+  ![image-20211006091442998](./assets/image-20211006091442998.png)
 
 ## 信号捕捉函数
 
@@ -1967,9 +1966,9 @@ int main() {
     - 注意：返回值定义在宏 `__USE_GNU`中，需要指定或者直接在程序中使用 `typedef __sighandler_t sighandler_t;`
   - `SIGKILL`和 `SIGSTOP`不能被捕捉，不能被忽略
 
-完善**过3秒以后，每隔2秒钟定时一次的定时器功能**
+完善过3秒以后，每隔2秒钟定时一次的定时器功能
 
-```c
+  ```cpp
 #include <sys/time.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -2014,7 +2013,7 @@ int main()
 
     return 0;
 }
-```
+  ```
 
 ![image-20211006100149339](02Linux多进程开发/image-20211006100149339.png)
 
@@ -2822,7 +2821,7 @@ int main()
   ```c
   #include <stdio.h>
   #include <unistd.h>
-
+  
   int main()
   {
       while (1) {
