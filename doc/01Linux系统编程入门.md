@@ -17,7 +17,7 @@
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse
       deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse
-
+      
       # 预发布软件源，不建议启用
       # deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
       # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse
@@ -41,13 +41,13 @@
    ```shell
    # 安装Vim环境
    sudo apt install vim
-
+   
    # 用于远程连接虚拟机
    sudo apt install openssh-server
-
+   
    # 用于查看IP地址
    sudo apt install net-tools
-
+   
    # 树形查看文件夹内容
    sudo apt install tree
    ```
@@ -94,7 +94,7 @@
 
     ```c
     #include<stdio.h>
-
+    
     int main()
     {
     #if DEBUG
@@ -109,7 +109,7 @@
     ```shell
     gcc test.c -o test
     ./test
-
+    
     # 输出
     hello, world
     ```
@@ -118,7 +118,7 @@
     ```shell
     gcc test.c -o test -D DEBUG
     ./test
-
+    
     # 输出
     Debug
     hello, world
@@ -182,7 +182,7 @@
   // main.c
   #include <stdio.h>
   #include "head.h"
-
+  
   int main()
   {
       int a = 20;
@@ -245,10 +245,10 @@
     ```shell
     # 修改~/.bashrc
     vim ~/.bashrc
-
+    
     # 在~/.bashrc中添加下行，保存退出
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/u/Desktop/Linux/calc/lib
-
+    
     # 使修改生效
     source ~/.bashrc
     ```
@@ -257,10 +257,10 @@
     ```shell
     # 修改/etc/profile
     sudo vim /etc/profile
-
+    
     # 在~/.bashrc中添加下行，保存退出
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/u/Desktop/Linux/calc/lib
-
+    
     # 使修改生效
     source /etc/profile
     ```
@@ -269,10 +269,10 @@
     ```shell
     # 修改/etc/ld.so.conf
     sudo vim /etc/ld.so.conf
-
+    
     # 在/etc/ld.so.conf中添加下行，保存退出
     /home/u/Desktop/Linux/calc/lib
-
+    
     # 更新配置
     sudo ldconfig
     ```
@@ -787,7 +787,7 @@ int test(int a) {
       void perror(const char *s);作用：打印errno对应的错误描述
           参数s：用户描述，比如hello, 最终输出的内容是  hello:xxx(实际的错误描述)
   */
-
+  
   #include <stdio.h>
   // 系统宏
   #include <sys/types.h>
@@ -796,20 +796,20 @@ int test(int a) {
   #include <fcntl.h>
   // close函数声明头文件
   #include <unistd.h>
-
+  
   int main() 
   {
       // 打开一个文件
       int fd = open("a.txt", O_RDONLY);
-
+  
       if(fd == -1) {
           perror("open");
       }
       // 读写操作
-
+  
       // 关闭
       close(fd);
-
+  
       return 0;
   }
   ```
@@ -838,19 +838,19 @@ int test(int a) {
   #include <fcntl.h>
   #include <unistd.h>
   #include <stdio.h>
-
+  
   int main() 
   {
       // 创建一个新的文件
       int fd = open("create.txt", O_RDWR | O_CREAT, 0777);
-
+  
       if(fd == -1) {
           perror("open");
       }
-
+  
       // 关闭
       close(fd);
-
+  
       return 0;
   }
   ```
@@ -1455,6 +1455,7 @@ int main()
               错误返回NULL
 
 
+
       // 读取目录中的数据
       #include <dirent.h>
       struct dirent *readdir(DIR *dirp);
@@ -1462,82 +1463,83 @@ int main()
           - 返回值：
               struct dirent，代表读取到的文件的信息
               读取到了末尾或者失败了，返回NULL
-
+    
       // 关闭目录
       #include <sys/types.h>
       #include <dirent.h>
       int closedir(DIR *dirp);
-
-  */
-  #include <sys/types.h>
-  #include <dirent.h>
-  #include <stdio.h>
-  #include <string.h>
-  #include <stdlib.h>
-
-  int getFileNum(const char * path);
-
-  // 读取某个目录下所有的普通文件的个数
-  int main(int argc, char * argv[]) 
-  {
-      if(argc < 2) {
-          printf("%s path\n", argv[0]);
-          return -1;
-      }
-
-      int num = getFileNum(argv[1]);
-
+    int num = getFileNum(argv[1]);
+    
       printf("普通文件的个数为：%d\n", num);
-
+    
       return 0;
-  }
+    }
+
 
   // 用于获取目录下所有普通文件的个数
   int getFileNum(const char * path) {
 
-      // 1.打开目录
-      DIR * dir = opendir(path);
+```cpp
+*/
+#include <sys/types.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-      if(dir == NULL) {
-          perror("opendir");
-          exit(0);
-      }
+int getFileNum(const char * path);
 
-      struct dirent *ptr;
-
-      // 记录普通文件的个数
-      int total = 0;
-
-      while((ptr = readdir(dir)) != NULL) {
-
-          // 获取名称
-          char * dname = ptr->d_name;
-
-          // 忽略掉. 和..
-          if(strcmp(dname, ".") == 0 || strcmp(dname, "..") == 0) {
-              continue;
-          }
-
-          // 判断是否是普通文件还是目录
-          if(ptr->d_type == DT_DIR) {
-              // 目录,需要继续读取这个目录
-              char newpath[256];
-              sprintf(newpath, "%s/%s", path, dname);
-              total += getFileNum(newpath);
-          }
-
-          if(ptr->d_type == DT_REG) {
-              // 普通文件
-              total++;
-          }
-      }
-
-      // 关闭目录
-      closedir(dir);
-
-      return total;
+// 读取某个目录下所有的普通文件的个数	
+  int main(int argc, char * argv[]) 
+  {
+  if(argc < 2) {
+  printf("%s path\n", argv[0]);
+  return -1;
   }
-  ```
+// 1.打开目录
+  DIR * dir = opendir(path);
+
+  if(dir == NULL) {
+      perror("opendir");
+      exit(0);
+  }
+
+  struct dirent *ptr;
+
+  // 记录普通文件的个数
+  int total = 0;
+
+  while((ptr = readdir(dir)) != NULL) {
+
+      // 获取名称
+      char * dname = ptr->d_name;
+
+      // 忽略掉. 和..
+      if(strcmp(dname, ".") == 0 || strcmp(dname, "..") == 0) {
+          continue;
+      }
+
+      // 判断是否是普通文件还是目录
+      if(ptr->d_type == DT_DIR) {
+          // 目录,需要继续读取这个目录
+          char newpath[256];
+          sprintf(newpath, "%s/%s", path, dname);
+          total += getFileNum(newpath);
+      }
+
+      if(ptr->d_type == DT_REG) {
+          // 普通文件
+          total++;
+      }
+  }
+
+  // 关闭目录
+  closedir(dir);
+
+  return total;
+}
+```
+
 
 ### 文件描述符之 `dup`、`dup2`
 
@@ -1557,7 +1559,9 @@ int main()
 
 
 */
+```
 
+  ```cpp
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -1591,7 +1595,7 @@ int main()
 
     return 0;
 }
-```
+  ```
 
 #### dup2
 
