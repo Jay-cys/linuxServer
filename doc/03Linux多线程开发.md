@@ -912,19 +912,19 @@ int main()
   #include <pthread.h>
   #include <stdlib.h>
   #include <unistd.h>
-
+  
   // 链表作为容器
   struct Node{
       int val;
       struct Node* next;
   };
-
+  
   // 头结点
   struct Node* head = NULL;
-
+  
   // 互斥量
   pthread_mutex_t mutex;
-
+  
   // 头插法增加元素
   void* producter(void* arg) {
       while (1) {
@@ -939,7 +939,7 @@ int main()
       }
       return NULL;
   }
-
+  
   // 头删法减少元素
   void* consumer(void* arg) {
       while (1) {
@@ -958,7 +958,7 @@ int main()
       }
       return NULL;
   }
-
+  
   int main()
   {
       // 初始化互斥锁
@@ -969,13 +969,13 @@ int main()
           pthread_create(&products[i], NULL, producter, NULL);
           pthread_create(&consumes[i], NULL, consumer, NULL);
       }
-
+  
       // 分离，回收线程资源
       for (int i = 0; i < 5; i++) {
           pthread_detach(products[i]);
           pthread_detach(consumes[i]);
       }
-
+  
       // 回收互斥锁
       pthread_mutex_destroy(&mutex);
       pthread_exit(NULL);     // 回收主线程
@@ -991,19 +991,19 @@ int main()
   #include <pthread.h>
   #include <stdlib.h>
   #include <unistd.h>
-
+  
   // 链表作为容器
   struct Node{
       int val;
       struct Node* next;
   };
-
+  
   // 头结点
   struct Node* head = NULL;
-
+  
   // 互斥量
   pthread_mutex_t mutex;
-
+  
   // 头插法增加元素
   void* producter(void* arg) {
       while (1) {
@@ -1018,7 +1018,7 @@ int main()
       }
       return NULL;
   }
-
+  
   // 头删法减少元素
   void* consumer(void* arg) {
       while (1) {
@@ -1036,7 +1036,7 @@ int main()
       }
       return NULL;
   }
-
+  
   int main()
   {
       // 初始化互斥锁
@@ -1047,13 +1047,13 @@ int main()
           pthread_create(&products[i], NULL, producter, NULL);
           pthread_create(&consumes[i], NULL, consumer, NULL);
       }
-
+  
       // 分离，回收线程资源
       for (int i = 0; i < 5; i++) {
           pthread_detach(products[i]);
           pthread_detach(consumes[i]);
       }
-
+  
       // 加while循环即可在虚拟机中生成core文件
       // while (1) {
       //     sleep(10);
@@ -1257,7 +1257,7 @@ void *producer(void *arg)
 {
     while (1)
     {
-        // 必须先判断信号量再上锁，否则会出现死锁现象
+        // 必须先判断信号量再上锁，否则会出现死锁现象 
         sem_wait(&psem);
         pthread_mutex_lock(&mutex);
         struct Node *newNode = (struct Node *)malloc(sizeof(head));
